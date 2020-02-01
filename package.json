@@ -19,7 +19,7 @@
     "yamljs": "^0.3.0"
   },
   "scripts": {
-    "start": "PORT=3001 nodemon -e js,yaml --watch server server/server.js"
+    "start": "nodemon -e js,yaml --watch server server/server.js"
   },
   "eslintConfig": {},
   "browserslist": [
