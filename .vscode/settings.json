@@ -1,0 +1,7 @@
+{
+  "editor.tabSize": 2,
+  "eslint.options": {
+    "parser": "babel-eslint"
+  },
+  "debug.toolBarLocation": "docked"
+}

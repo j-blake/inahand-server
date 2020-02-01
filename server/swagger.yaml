@@ -1,0 +1,490 @@
+openapi: 3.0.2
+info:
+  title: Inahand API
+  description: Endpoints for the Inahand react app
+  version: 0.1.0
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+security:
+  bearerAuth: []
+tags:
+- name: category
+  description: Categories are hierarchical tags used to denote transactions
+- name: account
+  description: Accounts are bank, credit card, loans, or whatever else you wish to record transactions
+- name: transaction
+  description: Transactions are atomic actions moving money to or from an account or accounts
+paths:
+  /categories:
+    get:
+      tags:
+      - category
+      summary: Get all transaction categories
+      description: get categories
+      operationId: getCategories
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+    security:
+      - bearerAuth: []
+  /category/{id}:
+    get:
+      tags:
+      - category
+      summary: Get category by ID
+      description: get category by ID
+      operationId: getCategoryById
+      parameters:
+      - name: id
+        in: path
+        description: ID of category to return
+        required: true
+        schema:
+          title: id
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Category not found
+    patch:
+      tags:
+      - category
+      summary: Update category by ID
+      description: update category by ID
+      operationId: updateCategoryById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the category to update
+        required: true
+        schema:
+          title: id
+          type: string
+      requestBody:
+        description: category information to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Category not found
+    delete:
+      tags:
+      - category
+      summary: Delete category by ID
+      description: Delete category or categories by ID. If the category is a parent, its entire hierarchy will also be deleted.
+      operationId: deleteCategoryById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the category to delete
+        required: true
+        schema:
+          title: id
+          type: string
+      responses:
+        204:
+          description: Category was successfully deleted
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Category not found
+  /category:
+    post:
+      tags:
+      - category
+      summary: Add a new category
+      description: add a new category
+      operationId: addNewCategory
+      requestBody:
+        description: category information to add to the system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      responses:
+        201:
+          description: Category created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+        400:
+          description: Invalid request
+  /accounts:
+    get:
+      tags:
+      - account
+      summary: Get all transaction categories
+      description: get accounts
+      operationId: getAccounts
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+  /account/{id}:
+    get:
+      tags:
+      - account
+      summary: Get account by ID
+      description: get account by ID
+      operationId: getAccountById
+      parameters:
+      - name: id
+        in: path
+        description: ID of account to return
+        required: true
+        schema:
+          title: id
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        400:
+          description: Invalid ID supplied
+        404:
+          description: account not found
+    patch:
+      tags:
+      - account
+      summary: Update account by ID
+      description: update account by ID
+      operationId: updateAccountById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the account to update
+        required: true
+        schema:
+          title: id
+          type: string
+      requestBody:
+        description: account information to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Account not found
+    delete:
+      tags:
+      - account
+      summary: Delete account by ID
+      description: Delete account by ID.
+      operationId: deleteAccountById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the account to delete
+        required: true
+        schema:
+          title: id
+          type: string
+      responses:
+        204:
+          description: Account was successfully deleted
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Account not found
+  /account:
+    post:
+      tags:
+      - account
+      summary: Add a new account
+      description: add a new account
+      operationId: addNewAccount
+      requestBody:
+        description: account information to add to the system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Account'
+        required: true
+      responses:
+        201:
+          description: Account created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+        400:
+          description: Invalid request
+  /transactions:
+    get:
+      tags:
+      - transaction
+      summary: Get all transactions
+      description: get transactions
+      operationId: getTransactions
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+  /transaction/{id}:
+    get:
+      tags:
+      - transaction
+      summary: Get transaction by ID
+      description: get transaction by ID
+      operationId: getTransactionById
+      parameters:
+      - name: id
+        in: path
+        description: ID of transaction to return
+        required: true
+        schema:
+          title: id
+          type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        400:
+          description: Invalid ID supplied
+        404:
+          description: transaction not found
+    patch:
+      tags:
+      - transaction
+      summary: Update transaction by ID
+      description: update transaction by ID
+      operationId: updateTransactionById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the transaction to update
+        required: true
+        schema:
+          title: id
+          type: string
+      requestBody:
+        description: transaction information to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Transaction not found
+    delete:
+      tags:
+      - transaction
+      summary: Delete transaction by ID
+      description: Delete transaction by ID.
+      operationId: deleteTransactionById
+      parameters:
+      - name: id
+        in: path
+        description: ID of the transaction to delete
+        required: true
+        schema:
+          title: id
+          type: string
+      responses:
+        204:
+          description: Transaction was successfully deleted
+        400:
+          description: Invalid ID supplied
+        404:
+          description: Transaction not found
+  /transaction:
+    post:
+      tags:
+      - transaction
+      summary: Add a new transaction
+      description: add a new transaction
+      operationId: addNewTransaction
+      requestBody:
+        description: transaction information to add to the system
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+        required: true
+      responses:
+        201:
+          description: transaction created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+        400:
+          description: Invalid request
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Category:
+      type: object
+      required:
+        - name
+      properties:
+        _id:
+          type: string
+          example: 5c2ad36a9edd9fe599a71e00
+        name:
+          type: string
+          example: Groceries
+        parent:
+          type: string
+          example: 5c2ad3499edd9fe599a71dff
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          example: '2019-01-01T02:37:39.046Z'
+        updatedAt:
+          type: string
+          example: '2019-01-04T02:26:28.037Z'
+    Account:
+      type: object
+      required:
+      - name
+      properties:
+        _id:
+          type: string
+          example: 5c295cb374d2abc1d869a14a
+        name:
+          type: string
+          example: Ragnar Bank Cave
+        initialBalance:
+          type: number
+          default: 0
+          example: 10000
+        currentBalance:
+          type: number
+          default: 0
+          example: 4749.55
+        isActive:
+          type: boolean
+          default: true
+          example: false
+        createdAt:
+          type: string
+          example: '2018-12-30T23:59:51.075Z'
+        updatedAt:
+          type: string
+          example: '2018-12-30T23:59:51.075Z'
+    Transaction:
+      type: object
+      required:
+      - amount
+        description
+        transactionDate
+      properties:
+        _id:
+          type: string
+          example: 5c2ad36a9edd9fe599a71e00
+        amount:
+          type: number
+          example: 49.95
+        description:
+          type: string
+          example: Brucie's Purse Shop
+        transactionDate:
+          type: string
+          example: '2019-07-16T20:12:23.045Z'
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              amount:
+                type: number
+                example: 50.55
+              category:
+                type: string
+                example: 5c2ad36a9edd9fe599a71e00
+        payerAccount:
+          type: string
+          example: 5c2ad36a9edd9fe599a71e00
+        payeeAccount:
+          type: string
+          example: 5c2ad36a9edd9fe599a71e00
+        createdAt:
+          type: string
+          example: '2019-01-01T02:37:39.046Z'
+        updatedAt:
+          type: string
+          example: '2019-01-04T02:26:28.037Z'
