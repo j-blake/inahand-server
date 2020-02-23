@@ -56,7 +56,7 @@ exports.authenticateLogin = async (req, res) => {
         signed: true,
         secure: true,
       })
-      .json(token);
+      .json({ token });
   } catch (e) {
     return res.status(400).send(e);
   }

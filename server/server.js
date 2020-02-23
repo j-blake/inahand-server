@@ -10,6 +10,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
+const cors = require('cors');
 const api = require('./routes');
 const jwtMiddleware = require('./middleware/jwt');
 
@@ -21,6 +22,11 @@ function createMongooseConnection() {
 
 function createExpressApp() {
   const expressApp = express();
+  expressApp.use(cors({
+    origin: ['http://localhost:3001', 'http://192.168.1.66:3001'],
+    credentials: true,
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  }));
   const swaggerDocument = YAML.load('server/swagger.yaml');
   expressApp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
