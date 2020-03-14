@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const passwordService = require('./password');
 const Identity = require('../model/identity');
 const Session = require('../model/session');
+const identityService = require('../service/identity');
 
 exports.createLogin = async (req, res) => {
   try {
@@ -57,6 +58,18 @@ exports.authenticateLogin = async (req, res) => {
         secure: true,
       })
       .json({ token });
+  } catch (e) {
+    return res.status(400).send(e);
+  }
+};
+
+exports.logout = async (req, res) => {
+  const cookie = req.signedCookies.inahand_session;
+  try {
+    const identity = await identityService.findOneBySession(cookie);
+    identity.sessions = [];
+    await identity.save();
+    return res.status(204).send();
   } catch (e) {
     return res.status(400).send(e);
   }
