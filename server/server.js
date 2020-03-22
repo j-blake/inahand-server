@@ -23,7 +23,7 @@ function createMongooseConnection() {
 function createExpressApp() {
   const expressApp = express();
   expressApp.use(cors({
-    origin: ['http://localhost:3001', 'http://192.168.1.66:3001'],
+    origin: ['http://localhost:3001'],
     credentials: true,
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   }));
