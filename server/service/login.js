@@ -8,17 +8,23 @@ const Identity = require('../model/identity');
 const Session = require('../model/session');
 const identityService = require('../service/identity');
 
+function formatValidationErrors(e) {
+  const errors = {};
+  _.forEach(e.toJSON().errors, (value, path) => {
+    errors[path] = value.message;
+  });
+  return errors;
+}
+
 exports.createLogin = async (req, res) => {
   try {
     const hash = await passwordService.createPasswordHash(req.body.password);
     const body = _.pick(req.body, ['firstName', 'lastName', 'email']);
-    const identity = new Identity(body);
-    identity.passwordHash = hash;
+    const identity = new Identity({ ...body, passwordHash: hash });
     await identity.save();
-    const responseIdentity = _.pick(identity, ['firstName', 'lastName', 'email']);
-    return res.status(201).json(responseIdentity);
+    return res.status(201).json({ user: identity.toObject() });
   } catch (e) {
-    return res.status(400).send(e);
+    return res.status(400).json({ errors: formatValidationErrors(e) });
   }
 };
 
