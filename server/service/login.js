@@ -98,7 +98,7 @@ exports.refreshSession = async (req, res) => {
     const newSession = createSession(agentHeader, remoteAddress);
     validSessions.push(newSession);
     identity.sessions = validSessions;
-    identity.save({ validateBeforeSave: false });
+    await identity.save({ validateBeforeSave: false });
     return res
       .status(200)
       .cookie(process.env.COOKIE_NAME, newSession.uuid, {
