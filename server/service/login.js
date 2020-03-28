@@ -57,7 +57,7 @@ exports.authenticateLogin = async (req, res) => {
     }
     const session = createSession(agentHeader, remoteAddress);
     identity.sessions.push(session);
-    await identity.save();
+    await identity.save({ validateBeforeSave: false });
     // eslint-disable-next-line no-underscore-dangle
     const token = jwt.sign({ userId: identity._id }, process.env.JWT_TOKEN, { expiresIn: '5m', algorithm: 'HS256' });
     return res
