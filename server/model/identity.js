@@ -7,7 +7,7 @@ const { Schema, model } = mongoose;
 
 const nameValidator = {
   // allow names containing apostrophes or dashes
-  validator: v => /^[-'.a-zA-Z]{1,50}$/.test(v),
+  validator: v => /^[-'.a-zA-Z]{0,50}$/.test(v),
   message: () => 'Enter a first name containing letters, apostrophes, dashes, or periods',
 };
 
