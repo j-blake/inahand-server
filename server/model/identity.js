@@ -44,11 +44,9 @@ const identitySchema = Schema({
   passwordHash: {
     type: String,
     required: true,
-    select: false,
   },
   sessions: {
     type: [sessionSchema.schema],
-    select: false,
   },
   activeAccounts: {
     type: [Schema.Types.ObjectId],
@@ -59,7 +57,6 @@ const identitySchema = Schema({
   isActive: {
     type: Boolean,
     default: true,
-    select: false,
   },
 },
 {
