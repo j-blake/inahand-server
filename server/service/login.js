@@ -79,7 +79,7 @@ exports.logout = async (req, res) => {
   try {
     const identity = await identityService.findOneBySession(cookie);
     identity.sessions = [];
-    await identity.save();
+    await identity.save({ validateBeforeSave: false });
     return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
   } catch (e) {
     return res.status(400).send(e);
@@ -98,7 +98,7 @@ exports.refreshSession = async (req, res) => {
     const newSession = createSession(agentHeader, remoteAddress);
     validSessions.push(newSession);
     identity.sessions = validSessions;
-    identity.save();
+    identity.save({ validateBeforeSave: false });
     return res
       .status(200)
       .cookie(process.env.COOKIE_NAME, newSession.uuid, {
