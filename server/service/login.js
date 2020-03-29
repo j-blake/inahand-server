@@ -10,9 +10,14 @@ const identityService = require('../service/identity');
 
 function formatValidationErrors(e) {
   const errors = {};
+  try {
   _.forEach(e.toJSON().errors, (value, path) => {
     errors[path] = value.message;
   });
+  } catch (err) {
+    // log error
+  }
+
   return errors;
 }
 
