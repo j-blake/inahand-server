@@ -5,20 +5,34 @@ const jwt = require('jsonwebtoken');
 
 const passwordService = require('./password');
 const Identity = require('../model/identity');
+const Profile = require('../model/profile');
 const Session = require('../model/session');
 const identityService = require('../service/identity');
 
-exports.createLogin = async (req, res) => {
+function formatValidationErrors(e) {
+  const errors = {};
+  try {
+    _.forEach(e.toJSON().errors, (value, path) => {
+      errors[path] = value.message;
+    });
+  } catch (err) {
+    // log error
+  }
+
+  return errors;
+}
+
+exports.createIdentity = async (req, res) => {
   try {
     const hash = await passwordService.createPasswordHash(req.body.password);
     const body = _.pick(req.body, ['firstName', 'lastName', 'email']);
-    const identity = new Identity(body);
-    identity.passwordHash = hash;
+    const profile = new Profile();
+    const identity = new Identity({ ...body, passwordHash: hash, profiles: [profile] });
+    await profile.save();
     await identity.save();
-    const responseIdentity = _.pick(identity, ['firstName', 'lastName', 'email']);
-    return res.status(201).json(responseIdentity);
+    return res.status(201).json({ user: identity.toObject() });
   } catch (e) {
-    return res.status(400).send(e);
+    return res.status(400).json({ errors: formatValidationErrors(e) });
   }
 };
 
@@ -51,7 +65,7 @@ exports.authenticateLogin = async (req, res) => {
     }
     const session = createSession(agentHeader, remoteAddress);
     identity.sessions.push(session);
-    await identity.save();
+    await identity.save({ validateBeforeSave: false });
     // eslint-disable-next-line no-underscore-dangle
     const token = jwt.sign({ userId: identity._id }, process.env.JWT_TOKEN, { expiresIn: '5m', algorithm: 'HS256' });
     return res
@@ -73,7 +87,7 @@ exports.logout = async (req, res) => {
   try {
     const identity = await identityService.findOneBySession(cookie);
     identity.sessions = [];
-    await identity.save();
+    await identity.save({ validateBeforeSave: false });
     return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
   } catch (e) {
     return res.status(400).send(e);
@@ -92,7 +106,7 @@ exports.refreshSession = async (req, res) => {
     const newSession = createSession(agentHeader, remoteAddress);
     validSessions.push(newSession);
     identity.sessions = validSessions;
-    identity.save();
+    await identity.save({ validateBeforeSave: false });
     return res
       .status(200)
       .cookie(process.env.COOKIE_NAME, newSession.uuid, {
