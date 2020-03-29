@@ -52,14 +52,7 @@ function createSession(agentHeader, remoteAddress) {
 exports.authenticateLogin = async (req, res) => {
   try {
     const { body: { email, password }, headers: { 'user-agent': agentHeader }, connection: { remoteAddress } } = req;
-    const identity = await Identity
-      .findOne({ email })
-      // todo not needed here but took a while to figure out; will be useful elsewhere
-      // .populate({
-      //   path: 'profiles',
-      //   populate: { path: 'accounts' },
-      // })
-      .exec();
+    const identity = await Identity.findOne({ email }).exec();
     const isAuthenticated = await passwordService.authenticatePassword(
       password,
       identity.passwordHash,

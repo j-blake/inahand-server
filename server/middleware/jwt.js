@@ -32,10 +32,10 @@ module.exports = async (req, res, next) => {
   if (!token) {
     return handleUnauthorizedResponse(res).send();
   }
-  let data = null;
   try {
-    data = await verifyToken(token);
-    req.userId = data.userId;
+    const data = await verifyToken(token);
+    const identity = await identityService.findOneById(data.userId);
+    req.identity = identity;
   } catch (e) {
     const cookie = req.signedCookies[process.env.COOKIE_NAME];
     if (_.isEmpty(cookie)) {
@@ -45,8 +45,7 @@ module.exports = async (req, res, next) => {
     if (!identity) {
       return handleUnauthorizedResponse(res).send();
     }
-    // eslint-disable-next-line no-underscore-dangle
-    req.userId = identity._id;
+    req.identity = identity;
   }
   return next();
 };
