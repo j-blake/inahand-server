@@ -16,7 +16,7 @@ function formatValidationErrors(e) {
   return errors;
 }
 
-exports.createLogin = async (req, res) => {
+exports.createIdentity = async (req, res) => {
   try {
     const hash = await passwordService.createPasswordHash(req.body.password);
     const body = _.pick(req.body, ['firstName', 'lastName', 'email']);
