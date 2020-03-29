@@ -35,7 +35,6 @@ module.exports = async (req, res, next) => {
   }
   try {
     const data = await verifyToken(token);
-    const identity = await identityService.findOneById(data.userId);
     if (!identity) {
       return handleUnauthorizedResponse(res).send();
     }
