@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const sessionSchema = require('./session');
+const Session = require('./session');
+const Profile = require('./profile');
 
 const { Schema, model } = mongoose;
 
@@ -45,15 +46,11 @@ const identitySchema = Schema({
     type: String,
     required: true,
   },
-  sessions: {
-    type: [sessionSchema.schema],
-  },
-  activeAccounts: {
-    type: [Schema.Types.ObjectId],
-    index: true,
-    default: [],
-    // todo ref: 'IdentityAccounts'
-  },
+  sessions: [Session.schema],
+  profiles: [{
+    type: Schema.Types.ObjectId,
+    ref: Profile,
+  }],
   isActive: {
     type: Boolean,
     default: true,

@@ -5,15 +5,16 @@ const jwt = require('jsonwebtoken');
 
 const passwordService = require('./password');
 const Identity = require('../model/identity');
+const Profile = require('../model/profile');
 const Session = require('../model/session');
 const identityService = require('../service/identity');
 
 function formatValidationErrors(e) {
   const errors = {};
   try {
-  _.forEach(e.toJSON().errors, (value, path) => {
-    errors[path] = value.message;
-  });
+    _.forEach(e.toJSON().errors, (value, path) => {
+      errors[path] = value.message;
+    });
   } catch (err) {
     // log error
   }
@@ -25,7 +26,9 @@ exports.createIdentity = async (req, res) => {
   try {
     const hash = await passwordService.createPasswordHash(req.body.password);
     const body = _.pick(req.body, ['firstName', 'lastName', 'email']);
-    const identity = new Identity({ ...body, passwordHash: hash });
+    const profile = new Profile();
+    const identity = new Identity({ ...body, passwordHash: hash, profiles: [profile] });
+    await profile.save();
     await identity.save();
     return res.status(201).json({ user: identity.toObject() });
   } catch (e) {
@@ -49,7 +52,14 @@ function createSession(agentHeader, remoteAddress) {
 exports.authenticateLogin = async (req, res) => {
   try {
     const { body: { email, password }, headers: { 'user-agent': agentHeader }, connection: { remoteAddress } } = req;
-    const identity = await Identity.findOne({ email }).exec();
+    const identity = await Identity
+      .findOne({ email })
+      // todo not needed here but took a while to figure out; will be useful elsewhere
+      // .populate({
+      //   path: 'profiles',
+      //   populate: { path: 'accounts' },
+      // })
+      .exec();
     const isAuthenticated = await passwordService.authenticatePassword(
       password,
       identity.passwordHash,
