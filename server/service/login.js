@@ -88,10 +88,10 @@ exports.logout = async (req, res) => {
     const identity = await identityService.findOneBySession(cookie);
     identity.sessions = [];
     await identity.save({ validateBeforeSave: false });
-    return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
   } catch (e) {
-    return res.status(400).send(e);
+    // do nothing; ensure cookie is always cleared
   }
+  return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
 };
 
 exports.refreshSession = async (req, res) => {

@@ -5,6 +5,7 @@ const identityService = require('../service/identity');
 const PUBLIC_PATHS = [
   '/api/auth/login',
   '/api/auth/create',
+  '/api/auth/logout',
 ];
 
 async function verifyToken(token) {
@@ -35,6 +36,9 @@ module.exports = async (req, res, next) => {
   try {
     const data = await verifyToken(token);
     const identity = await identityService.findOneById(data.userId);
+    if (!identity) {
+      return handleUnauthorizedResponse(res).send();
+    }
     req.identity = identity;
   } catch (e) {
     const cookie = req.signedCookies[process.env.COOKIE_NAME];
