@@ -7,6 +7,10 @@ const categorySchema = Schema({
     type: String,
     required: true,
   },
+  profile: {
+    type: Schema.Types.ObjectId,
+    ref: 'Profile',
+  },
   parent: {
     type: Schema.Types.ObjectId,
     ref: 'Category',
@@ -18,22 +22,27 @@ const categorySchema = Schema({
   timestamps: true,
 });
 
-categorySchema.pre('remove', function preRemove(next) {
-  const CategoryModel = model('Category');
-  /* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
-  CategoryModel.find({ parent: this._id }).exec((err, categories) => {
-    if (err !== null) {
-      return console.error(err);
-    }
+async function preRemove(next) {
+  try {
+    const Category = model('Category');
+    const categories = await Category.find({ parent: this.id }).exec();
     categories.forEach((category) => {
-      try {
-        category.remove();
-      } catch (e) {
-        console.error(e);
-      }
+      category.remove();
     });
-    return next();
-  });
-});
+  } catch (e) {
+    throw e;
+  }
+  return next();
+}
+categorySchema.pre('remove', preRemove);
+
+function transformToObject(doc) {
+  return {
+    id: doc.id,
+    name: doc.name,
+    parent: doc.parent,
+  };
+}
+categorySchema.set('toObject', { transform: transformToObject });
 
 module.exports = model('Category', categorySchema);
