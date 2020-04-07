@@ -11,12 +11,20 @@ const cookieParser = require('cookie-parser');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const cors = require('cors');
+const helmet = require('helmet');
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const api = require('./routes');
-const jwtMiddleware = require('./middleware/jwt');
+const authentication = require('./middleware/authentication');
 
 function createMongooseConnection() {
   const uri = process.env.DB_CONNECTION;
-  mongoose.connect(uri, { useNewUrlParser: true });
+  mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useUnifiedTopology: true,
+  });
   return mongoose.connection;
 }
 
@@ -26,6 +34,20 @@ function createExpressApp() {
     origin: ['http://localhost:3001'],
     credentials: true,
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  }));
+  expressApp.use(helmet());
+  expressApp.use(session({
+    name: 'inahand.sid',
+    secret: process.env.CONNECT_MONGO_SECRET,
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    resave: true,
+    saveUninitialized: true,
+    cookie: {
+      httpOnly: true,
+      secure: true,
+      expires: new Date(Date.now() + 600000), // 10 minutes from now,
+      signed: true,
+    },
   }));
   const swaggerDocument = YAML.load('server/swagger.yaml');
   expressApp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -37,7 +59,7 @@ function createExpressApp() {
 
   // Point static path to dist
   expressApp.use(express.static(path.join(__dirname, 'dist')));
-  expressApp.use(jwtMiddleware);
+  expressApp.use(authentication);
   expressApp.use('/api', api);
 
   // Catch all other routes and return the index file
