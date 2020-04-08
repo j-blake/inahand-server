@@ -15,7 +15,6 @@ const helmet = require('helmet');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const api = require('./routes');
-const authentication = require('./middleware/authentication');
 
 function createMongooseConnection() {
   const uri = process.env.DB_CONNECTION;
@@ -59,7 +58,6 @@ function createExpressApp() {
 
   // Point static path to dist
   expressApp.use(express.static(path.join(__dirname, 'dist')));
-  expressApp.use(authentication);
   expressApp.use('/api', api);
 
   // Catch all other routes and return the index file
