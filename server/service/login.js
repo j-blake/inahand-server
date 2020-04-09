@@ -47,7 +47,7 @@ function createUserAgentDocument(agentHeader, remoteAddress) {
 exports.authenticateLogin = async (req, res) => {
   try {
     const { body: { email, password }, headers: { 'user-agent': agentHeader }, connection: { remoteAddress } } = req;
-    const identity = await Identity.findOne({ email }).exec();
+    const identity = await identityService.findOneByEmailNoPopulate(email);
     const { passwordHash: hash } = identity;
     const isAuthenticated = await passwordService.authenticatePassword(password, hash);
     if (!isAuthenticated) {
@@ -58,21 +58,26 @@ exports.authenticateLogin = async (req, res) => {
     }
     req.session.identity = identity.id;
     req.session.userAgent = createUserAgentDocument(agentHeader, remoteAddress);
-    await req.session.save();
-    return res.status(200).send();
+    return req.session.save((err) => {
+      if (err) {
+        return res.status(400).send();
+      }
+      return res.status(200).send();
+    });
   } catch (e) {
     return res.status(400).send(e);
   }
 };
 
-exports.logout = async (req, res) => {
-  const cookie = req.signedCookies[process.env.COOKIE_NAME];
-  try {
-    const identity = await identityService.findOneBySession(cookie);
-    identity.sessions = [];
-    await identity.save({ validateBeforeSave: false });
-  } catch (e) {
-    // do nothing; ensure cookie is always cleared
+// todo ensure cookie is cleared on logout
+exports.logout = function logout(req, res) {
+  if (req.session) {
+    return req.session.destroy((err) => {
+      if (err) {
+        // todo log this
+      }
+      return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
+    });
   }
   return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
 };

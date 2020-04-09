@@ -36,11 +36,11 @@ function createExpressApp() {
   }));
   expressApp.use(helmet());
   expressApp.use(session({
-    name: 'inahand.sid',
+    name: process.env.COOKIE_NAME,
     secret: process.env.CONNECT_MONGO_SECRET,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     cookie: {
       httpOnly: true,
       secure: true,
