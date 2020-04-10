@@ -30,7 +30,6 @@ function createMongooseConnection() {
 
 function createExpressApp() {
   const expressApp = express();
-  expressApp.use(morgan());
   expressApp.use(cors({
     origin: ['http://localhost:3001'],
     credentials: true,
@@ -52,6 +51,8 @@ function createExpressApp() {
   }));
   const swaggerDocument = YAML.load('server/swagger.yaml');
   expressApp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+  expressApp.use(morgan());
 
   // Parsers for POST data
   expressApp.use(bodyParser.json());
