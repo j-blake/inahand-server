@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const cors = require('cors');
+const morgan = require('morgan');
 const helmet = require('helmet');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -29,6 +30,7 @@ function createMongooseConnection() {
 
 function createExpressApp() {
   const expressApp = express();
+  expressApp.use(morgan());
   expressApp.use(cors({
     origin: ['http://localhost:3001'],
     credentials: true,
