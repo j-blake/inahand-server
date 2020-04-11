@@ -40,19 +40,21 @@ function createExpressApp() {
     name: process.env.COOKIE_NAME,
     secret: process.env.CONNECT_MONGO_SECRET,
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-    resave: false,
+    resave: true,
+    rolling: true,
     saveUninitialized: false,
+    unset: 'destroy',
     cookie: {
       httpOnly: true,
       secure: true,
-      expires: new Date(Date.now() + 600000), // 10 minutes from now,
+      maxAge: 10 * 60 * 1000, // 10 minutes from now,
       signed: true,
     },
   }));
   const swaggerDocument = YAML.load('server/swagger.yaml');
   expressApp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-  expressApp.use(morgan());
+  expressApp.use(morgan('dev'));
 
   // Parsers for POST data
   expressApp.use(bodyParser.json());
