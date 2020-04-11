@@ -69,7 +69,6 @@ exports.authenticateLogin = async (req, res) => {
   }
 };
 
-// todo ensure cookie is cleared on logout
 exports.logout = function logout(req, res) {
   if (req.session) {
     return req.session.destroy((err) => {
