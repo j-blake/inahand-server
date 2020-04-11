@@ -1,12 +1,9 @@
 const _ = require('lodash');
-const uuid = require('uuid/v4');
 const useragent = require('useragent');
-const jwt = require('jsonwebtoken');
 
 const passwordService = require('./password');
 const Identity = require('../model/identity');
 const Profile = require('../model/profile');
-const Session = require('../model/session');
 const identityService = require('../service/identity');
 
 function formatValidationErrors(e) {
@@ -36,87 +33,50 @@ exports.createIdentity = async (req, res) => {
   }
 };
 
-function createSession(agentHeader, remoteAddress) {
-  const session = new Session();
-  session.uuid = uuid();
+function createUserAgentDocument(agentHeader, remoteAddress) {
   const agent = useragent.parse(agentHeader);
-  session.userAgent = {
+  const userAgent = {
     agent: agent.toString(),
     os: agent.os.toString(),
     device: agent.device.toString(),
+    ipAddress: remoteAddress,
   };
-  session.ipAddress = remoteAddress;
-  return session;
+  return userAgent;
 }
 
 exports.authenticateLogin = async (req, res) => {
   try {
     const { body: { email, password }, headers: { 'user-agent': agentHeader }, connection: { remoteAddress } } = req;
-    const identity = await Identity.findOne({ email }).exec();
-    const isAuthenticated = await passwordService.authenticatePassword(
-      password,
-      identity.passwordHash,
-    );
+    const identity = await identityService.findOneByEmailNoPopulate(email);
+    const { passwordHash: hash } = identity;
+    const isAuthenticated = await passwordService.authenticatePassword(password, hash);
     if (!isAuthenticated) {
       return res
         .status(401)
         .append('WWW-Authenticate', 'Bearer realm="Access to inahand data layer" charset="UTF-8"')
         .send();
     }
-    const session = createSession(agentHeader, remoteAddress);
-    identity.sessions.push(session);
-    await identity.save({ validateBeforeSave: false });
-    // eslint-disable-next-line no-underscore-dangle
-    const token = jwt.sign({ userId: identity._id }, process.env.JWT_TOKEN, { expiresIn: '5m', algorithm: 'HS256' });
-    return res
-      .status(200)
-      .cookie(process.env.COOKIE_NAME, session.uuid, {
-        expires: new Date(Date.now() + 600000), // 10 minutes from now
-        httpOnly: true,
-        signed: true,
-        secure: true,
-      })
-      .json({ token });
+    req.session.identity = identity.id;
+    req.session.userAgent = createUserAgentDocument(agentHeader, remoteAddress);
+    return req.session.save((err) => {
+      if (err) {
+        return res.status(400).send();
+      }
+      return res.status(200).send();
+    });
   } catch (e) {
     return res.status(400).send(e);
   }
 };
 
-exports.logout = async (req, res) => {
-  const cookie = req.signedCookies[process.env.COOKIE_NAME];
-  try {
-    const identity = await identityService.findOneBySession(cookie);
-    identity.sessions = [];
-    await identity.save({ validateBeforeSave: false });
-  } catch (e) {
-    // do nothing; ensure cookie is always cleared
+exports.logout = function logout(req, res) {
+  if (req.session) {
+    return req.session.destroy((err) => {
+      if (err) {
+        // todo log this
+      }
+      return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
+    });
   }
   return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
-};
-
-exports.refreshSession = async (req, res) => {
-  const cookie = req.signedCookies[process.env.COOKIE_NAME];
-  try {
-    const identity = await identityService.findOneBySession(cookie);
-    if (!identity) {
-      return res.status(404).send();
-    }
-    const validSessions = identity.sessions.filter(session => session.uuid !== cookie);
-    const { headers: { 'user-agent': agentHeader }, connection: { remoteAddress } } = req;
-    const newSession = createSession(agentHeader, remoteAddress);
-    validSessions.push(newSession);
-    identity.sessions = validSessions;
-    await identity.save({ validateBeforeSave: false });
-    return res
-      .status(200)
-      .cookie(process.env.COOKIE_NAME, newSession.uuid, {
-        expires: new Date(Date.now() + 600000), // 10 minutes from now
-        httpOnly: true,
-        signed: true,
-        secure: true,
-      })
-      .send();
-  } catch (e) {
-    return res.status(400).send(e);
-  }
 };

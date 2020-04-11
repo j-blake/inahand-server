@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-
-const Session = require('./session');
 const Profile = require('./profile');
 
 const { Schema, model } = mongoose;
@@ -46,7 +44,6 @@ const identitySchema = Schema({
     type: String,
     required: true,
   },
-  sessions: [Session.schema],
   profiles: [{
     type: Schema.Types.ObjectId,
     ref: Profile,

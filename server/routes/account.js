@@ -1,7 +1,7 @@
 const express = require('express');
+const account = require('../service/account');
 
 const router = express.Router();
-const account = require('../service/account');
 
 router.get('/accounts', (req, res) => account.findAll(req, res));
 
