@@ -80,6 +80,7 @@ connection.on('error', console.error.bind(console, 'connection error:'));
 
 const app = createExpressApp();
 const server = http.createServer(app);
+// https://docs.microsoft.com/en-us/azure/application-gateway/self-signed-certificates
 const options = {
   key: fs.readFileSync(path.join(__dirname, '../server.key'), 'utf8'),
   cert: fs.readFileSync(path.join(__dirname, '../server.crt'), 'utf8'),
