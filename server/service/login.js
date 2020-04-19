@@ -80,3 +80,15 @@ exports.logout = function logout(req, res) {
   }
   return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
 };
+
+exports.checkAuthentication = async function checkAuthentication(req, res) {
+  const { session } = req;
+  try {
+    const identity = await identityService.findOneById(session.identity);
+    const status = identity ? 204 : 401;
+    res.status(status);
+  } catch (e) {
+    res.status(401);
+  }
+  return res.send();
+};
