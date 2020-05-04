@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const mongoose = require('mongoose');
 
-function createMongooseConnection() {
+async function createMongooseConnection() {
   const uri = process.env.DB_CONNECTION;
   const options = {
     useNewUrlParser: true,
@@ -9,10 +9,12 @@ function createMongooseConnection() {
     useFindAndModify: false,
     useUnifiedTopology: true,
   };
-  mongoose.connect(uri, options).then(
-    () => console.log('successful database connection'),
-    err => console.error('connection error: ', err),
-  );
-  return mongoose.connection;
+  try {
+    await mongoose.connect(uri, options);
+    return mongoose.connection;
+  } catch(err) {
+    console.error('connection error: ', err);
+    process.exit(1);
+  }
 }
 module.exports = createMongooseConnection;
