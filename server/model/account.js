@@ -25,4 +25,4 @@ accountSchema.statics.findAll = function findAll(callback) {
   });
 };
 
-module.exports = model('Account', accountSchema);
+module.exports = mongoose.models.Account || model('Account', accountSchema);

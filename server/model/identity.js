@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-const Profile = require('./profile');
 
 const { Schema, model } = mongoose;
 
@@ -46,7 +45,7 @@ const identitySchema = Schema({
   },
   profiles: [{
     type: Schema.Types.ObjectId,
-    ref: Profile,
+    ref: 'Profile',
   }],
   isActive: {
     type: Boolean,
@@ -67,4 +66,4 @@ function transformToObject(doc) {
 }
 identitySchema.set('toObject', { transform: transformToObject });
 
-module.exports = model('Identity', identitySchema);
+module.exports = mongoose.models.Identity || model('Identity', identitySchema);

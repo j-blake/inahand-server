@@ -45,4 +45,4 @@ function transformToObject(doc) {
 }
 categorySchema.set('toObject', { transform: transformToObject });
 
-module.exports = model('Category', categorySchema);
+module.exports = mongoose.models.Category || model('Category', categorySchema);
