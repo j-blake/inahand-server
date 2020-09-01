@@ -24,4 +24,4 @@ suite('mongoose', function() {
     await connectMongoose();
     assert(process.exit.called);
   })
-})
+});
