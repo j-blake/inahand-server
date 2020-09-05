@@ -1,0 +1,15 @@
+env:
+  node: true
+  es6: true
+  mocha: true
+plugins:
+  - prettier
+rules:
+  prettier/prettier: error
+  padded-blocks:
+    - error
+    - never
+  extends:
+    - prettier
+    - airbnb-base
+    - plugin:mocha/recommended
