@@ -12,9 +12,9 @@ async function createMongooseConnection() {
   try {
     await mongoose.connect(uri, options);
     return mongoose.connection;
-  } catch(err) {
+  } catch (err) {
     console.error('connection error: ', err);
-    process.exit(1);
+    return process.exit(1);
   }
 }
 module.exports = createMongooseConnection;

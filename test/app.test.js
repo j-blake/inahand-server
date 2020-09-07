@@ -1,9 +1,9 @@
-const assert = require("chai").assert;
-require("dotenv").config();
-const app = require("../server/app");
+const { assert } = require('chai');
+require('dotenv').config();
+const app = require('../server/app');
 
-suite("app", function () {
-  test("app is mounted", function () {
-    assert.equal(app.mountpath, "/");
+suite('app', function appSuite() {
+  test('app is mounted', function appIsMounted() {
+    assert.equal(app.mountpath, '/');
   });
 });

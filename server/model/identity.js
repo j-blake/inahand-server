@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+const mongoose = require('mongoose');
+const validator = require('validator');
 
 const { Schema, model } = mongoose;
 
@@ -7,12 +7,12 @@ const nameValidator = {
   // allow names containing apostrophes or dashes
   validator: (v) => /^[-'.a-zA-Z]{0,50}$/.test(v),
   message: () =>
-    "Enter a first name containing letters, apostrophes, dashes, or periods",
+    'Enter a first name containing letters, apostrophes, dashes, or periods',
 };
 
 const validateUniqueEmail = async (v) => {
   const identity = await mongoose
-    .model("Identity")
+    .model('Identity')
     .findOne({ email: v })
     .exec();
   return identity === null;
@@ -51,7 +51,7 @@ const identitySchema = Schema(
     profiles: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Profile",
+        ref: 'Profile',
       },
     ],
     isActive: {
@@ -71,6 +71,6 @@ function transformToObject(doc) {
     email: doc.email,
   };
 }
-identitySchema.set("toObject", { transform: transformToObject });
+identitySchema.set('toObject', { transform: transformToObject });
 
-module.exports = mongoose.models.Identity || model("Identity", identitySchema);
+module.exports = mongoose.models.Identity || model('Identity', identitySchema);

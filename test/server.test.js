@@ -1,6 +1,7 @@
-const assert = require("chai").assert;
-suite("server", function () {
-  test("mocha and chai are running", function () {
+const { assert } = require('chai');
+
+suite('server', function serverSuite() {
+  test('mocha and chai are running', function mochaWorks() {
     assert(true);
   });
 });

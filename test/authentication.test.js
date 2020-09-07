@@ -1,43 +1,43 @@
-const assert = require("chai").assert;
-const sinon = require("sinon");
-const authentication = require("../server/middleware/authentication");
-const identityService = require("../server/service/identity");
-const express = require("express");
+const { assert } = require('chai');
+const sinon = require('sinon');
+const express = require('express');
+const identityService = require('../server/service/identity');
+const authentication = require('../server/middleware/authentication');
 
 const req = Object.create(express.request);
 const res = Object.create(express.response);
 const next = () => {};
 
-suite("middleware - authentication", function () {
-  setup(function () {
-    sinon.stub(res, "append").returns(res);
-    sinon.stub(res, "send").returns(res);
-    sinon.stub(identityService, "findOneById");
+suite('middleware - authentication', function authenticationSuite() {
+  setup(function setup() {
+    sinon.stub(res, 'append').returns(res);
+    sinon.stub(res, 'send').returns(res);
+    sinon.stub(identityService, 'findOneById');
   });
 
-  teardown(function () {
+  teardown(function teardown() {
     sinon.restore();
   });
 
-  test("missing session object returns 401", function () {
+  test('missing session object returns 401', function missingSession() {
     authentication(req, res, next);
     assert.equal(res.statusCode, 401);
   });
 
-  test("null identity returns 401", async function () {
-    req.session = { identity: "narf" };
+  test('null identity returns 401', async function nullIdentity() {
+    req.session = { identity: 'narf' };
     identityService.findOneById.resolves(null);
     await authentication(req, res, next);
     assert.equal(res.statusCode, 401);
   });
 
-  test("valid session appends identity to request and calls next()", async function () {
-    const next = sinon.spy();
-    identity = { mockIdentity: 42 };
-    req.session = { identity: "narf" };
+  test('valid session appends identity to request and calls next()', async function validSession() {
+    const nextSpy = sinon.spy();
+    const identity = { mockIdentity: 42 };
+    req.session = { identity: 'narf' };
     identityService.findOneById.resolves(identity);
-    await authentication(req, res, next);
+    await authentication(req, res, nextSpy);
     assert.equal(req.identity, identity);
-    assert.isTrue(next.calledOnce);
+    assert.isTrue(nextSpy.calledOnce);
   });
 });
