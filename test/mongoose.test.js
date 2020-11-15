@@ -15,9 +15,10 @@ suite('mongoose', function mongooseSuite() {
     // eslint-disable-next-line no-console
     console.error.restore();
   });
-  test('connection to mongoose returns connection', async function connectionSuccess() {
+  test('mongoose connects to MongoDB', async function connectionSuccess() {
     mongoose.connect.resolves(true);
-    assert(await connectMongoose());
+    const connection = await connectMongoose();
+    assert.equal(1, connection.readyState);
   });
   test('application exits on mongoose connection failure', async function connectionFailure() {
     mongoose.connect.throws();
