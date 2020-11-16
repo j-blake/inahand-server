@@ -36,7 +36,7 @@ const identitySchema = Schema(
       validate: [
         {
           validator: (v) => validator.isEmail(v),
-          message: (props) => `${props.value} is not a valid email addresss`,
+          message: (props) => `${props.value} is not a valid email address`,
         },
         {
           validator: (v) => validateUniqueEmail(v),
