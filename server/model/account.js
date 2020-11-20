@@ -2,18 +2,20 @@ const mongoose = require('mongoose');
 
 const { Schema, model } = mongoose;
 
-const accountSchema = Schema({
-  name: {
-    type: String,
-    required: true,
+const accountSchema = Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    initialBalance: { type: Number, required: true },
+    currentBalance: { type: Number, default: 0 },
+    isActive: { type: Boolean, default: true },
   },
-  initialBalance: { type: Number, required: true },
-  currentBalance: { type: Number, default: 0 },
-  isActive: { type: Boolean, default: true },
-},
-{
-  timestamps: true,
-});
+  {
+    timestamps: true,
+  }
+);
 
 // todo handle the response
 accountSchema.statics.findAll = function findAll(callback) {
