@@ -18,7 +18,7 @@ suite('mongoose', function mongooseSuite() {
   test('mongoose connects to MongoDB', async function connectionSuccess() {
     mongoose.connect.resolves(true);
     const connection = await connectMongoose();
-    assert.equal(1, connection.readyState);
+    assert.instanceOf(connection, mongoose.Connection);
   });
   test('application exits on mongoose connection failure', async function connectionFailure() {
     mongoose.connect.throws();
