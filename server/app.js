@@ -10,13 +10,21 @@ const connectMongoose = require('./mongoose');
 const sessionMiddleware = require('./middleware/session');
 const routes = require('./routes');
 
-const app = express();
-const init = async () => {
-  app.use(cors({
-    origin: ['http://localhost:3001'],
-    credentials: true,
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  }));
+const setupApp = async () => {
+  const app = express();
+  app.use(
+    cors({
+      origin: ['http://localhost:3001'],
+      credentials: true,
+      allowedHeaders: [
+        'Origin',
+        'X-Requested-With',
+        'Content-Type',
+        'Accept',
+        'Authorization',
+      ],
+    })
+  );
   app.use(helmet());
   app.use(sessionMiddleware(await connectMongoose()));
 
@@ -34,8 +42,11 @@ const init = async () => {
   app.use('/api', routes);
 
   // Catch all other routes and return the index file
-  app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'dist/index.html')));
-
+  app.get('*', (req, res) =>
+    res.sendFile(path.join(__dirname, 'dist/index.html'))
+  );
+  return app;
 };
-init();
-module.exports = app;
+
+const init = () => setupApp();
+module.exports = init;
