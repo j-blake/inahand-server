@@ -1,0 +1,59 @@
+const useragent = require('useragent');
+
+const passwordService = require('./password');
+const userFactory = require('../model/factory/user');
+const Identity = require('../model/identity');
+
+async function findOneById(id) {
+  Identity.findById(id)
+    .populate({
+      path: 'profiles',
+      populate: { path: 'accounts' },
+    })
+    .exec();
+}
+
+exports.findOneById = async (id) => findOneById(id);
+
+exports.createUser = async (firstName, lastName, email, hash) => {
+  try {
+    const identity = userFactory.createUser(firstName, lastName, email, hash);
+    await identity.save();
+    return identity;
+  } catch (e) {
+    // todo log error
+    return null;
+  }
+};
+
+exports.findByAuthentication = async (email, password) => {
+  try {
+    const identity = await Identity.findOne({ email }).exec();
+    if (!identity) {
+      return null;
+    }
+    const { passwordHash: hash } = identity;
+    const isAuthenticated = await passwordService.authenticatePassword(
+      password,
+      hash
+    );
+    if (!isAuthenticated) {
+      return null;
+    }
+    return identity;
+  } catch (e) {
+    // todo log exception
+    return null;
+  }
+};
+
+exports.createUserAgentDocument = (agentHeader, remoteAddress) => {
+  const agent = useragent.parse(agentHeader);
+  const userAgent = {
+    agent: agent.toString(),
+    os: agent.os.toString(),
+    device: agent.device.toString(),
+    ipAddress: remoteAddress,
+  };
+  return userAgent;
+};

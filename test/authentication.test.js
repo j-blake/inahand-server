@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const sinon = require('sinon');
 const express = require('express');
-const identityService = require('../server/service/identity');
+const userService = require('../server/service/user');
 const authentication = require('../server/middleware/authentication');
 
 const req = Object.create(express.request);
@@ -12,7 +12,7 @@ suite('middleware - authentication', function authenticationSuite() {
   setup(function setup() {
     sinon.stub(res, 'append').returns(res);
     sinon.stub(res, 'send').returns(res);
-    sinon.stub(identityService, 'findOneById');
+    sinon.stub(userService, 'findOneById');
   });
 
   teardown(function teardown() {
@@ -26,7 +26,7 @@ suite('middleware - authentication', function authenticationSuite() {
 
   test('null identity returns 401', async function nullIdentity() {
     req.session = { identity: 'narf' };
-    identityService.findOneById.resolves(null);
+    userService.findOneById.resolves(null);
     await authentication(req, res, next);
     assert.equal(res.statusCode, 401);
   });
@@ -35,7 +35,7 @@ suite('middleware - authentication', function authenticationSuite() {
     const nextSpy = sinon.spy();
     const identity = { mockIdentity: 42 };
     req.session = { identity: 'narf' };
-    identityService.findOneById.resolves(identity);
+    userService.findOneById.resolves(identity);
     await authentication(req, res, nextSpy);
     assert.equal(req.identity, identity);
     assert.isTrue(nextSpy.calledOnce);
