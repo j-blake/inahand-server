@@ -10,16 +10,16 @@ const passwordService = require('../server/service/password');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/api', authRouter);
 const agent = request.agent(app);
 
-const first = 'yark';
+const first = 'nathaniel';
 const last = 'tarp';
 const email = 'y@t.com';
 
 suite('auth router', function authRouterSuite() {
   setup(function setup() {
-    app.use('/api', authRouter);
-    sinon.stub(passwordService, 'createPasswordHash').resolves('passhash');
+    sinon.stub(passwordService, 'createPasswordHash').resolves('passwordHash');
     sinon.stub(userService, 'createUser').resolves({
       firstName: first,
       lastName: last,
