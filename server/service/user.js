@@ -49,11 +49,10 @@ exports.findByAuthentication = async (email, password) => {
 
 exports.createUserAgentDocument = (agentHeader, remoteAddress) => {
   const agent = useragent.parse(agentHeader);
-  const userAgent = {
+  return {
     agent: agent.toString(),
     os: agent.os.toString(),
     device: agent.device.toString(),
     ipAddress: remoteAddress,
   };
-  return userAgent;
 };

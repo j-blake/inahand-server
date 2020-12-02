@@ -2,6 +2,7 @@ const _ = require('lodash');
 const express = require('express');
 const passwordService = require('../../service/password');
 const userService = require('../../service/user');
+const sessionService = require('../../service/session');
 
 const router = express.Router();
 
@@ -44,23 +45,21 @@ router.post('/auth/login', async (req, res) => {
         )
         .send();
     }
-    req.session.identity = identity.id;
     const {
+      session,
       headers: { 'user-agent': agentHeader },
       connection: { remoteAddress },
     } = req;
-    req.session.userAgent = userService.createUserAgentDocument(
+    session.identity = identity.id;
+    session.userAgent = userService.createUserAgentDocument(
       agentHeader,
       remoteAddress
     );
-    return req.session.save((err) => {
-      if (err) {
-        return res.status(400).send();
-      }
-      return res.status(200).send();
-    });
+    await sessionService.saveSession(session);
+    return res.status(200).send();
   } catch (e) {
-    return res.status(400).send(e);
+    // todo log error
+    return res.status(400).send();
   }
 });
 
