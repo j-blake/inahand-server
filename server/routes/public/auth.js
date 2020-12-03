@@ -63,14 +63,14 @@ router.post('/auth/login', async (req, res) => {
   }
 });
 
-router.post('/auth/logout', (req, res) => {
-  if (req.session) {
-    return req.session.destroy((err) => {
-      if (err) {
-        // todo log exception
-      }
-      return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
-    });
+router.post('/auth/logout', async (req, res) => {
+  const { session } = req;
+  if (session) {
+    try {
+      await sessionService.destroySession(session);
+    } catch (e) {
+      // todo log error
+    }
   }
   return res.status(204).clearCookie(process.env.COOKIE_NAME).send();
 });

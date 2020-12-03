@@ -90,4 +90,32 @@ suite('auth router', function authRouterSuite() {
     sinon.stub(sessionService, 'saveSession').throws();
     agent.post('/api/auth/login').send({ email }).expect(400, done);
   });
+
+  test('should delete the session document if it exists and clear cookie when logging out', function deleteSessionDocument(done) {
+    sinon.stub(sessionService, 'destroySession').resolves();
+    sinon.spy(express.response, 'clearCookie');
+    agent
+      .post('/api/auth/logout')
+      .expect(204)
+      .then(() => {
+        assert(sessionService.destroySession.calledOnce);
+        assert(express.response.clearCookie.calledOnce);
+        done();
+      })
+      .catch((err) => done(err));
+  });
+
+  test('should clear the cookie even if error thrown when logging out', function clearSessionCookie(done) {
+    sinon.stub(sessionService, 'destroySession').throws();
+    sinon.spy(express.response, 'clearCookie');
+    agent
+      .post('/api/auth/logout')
+      .expect(204)
+      .then(() => {
+        assert(sessionService.destroySession.calledOnce);
+        assert(express.response.clearCookie.calledOnce);
+        done();
+      })
+      .catch((err) => done(err));
+  });
 });
