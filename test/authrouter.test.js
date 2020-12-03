@@ -84,10 +84,10 @@ suite('auth router', function authRouterSuite() {
       .expect(200, done);
   });
 
-  test('should return 400 session save fails', function missingPassword(done) {
+  test('should return 400 on login if session save fails', function missingPassword(done) {
     sinon.stub(userService, 'findByAuthentication').resolves({ id: 7 });
-    agent.post('/api/auth/login').send({ email }).expect(400, done);
     sinon.stub(userService, 'createUserAgentDocument').returns();
     sinon.stub(sessionService, 'saveSession').throws();
+    agent.post('/api/auth/login').send({ email }).expect(400, done);
   });
 });
