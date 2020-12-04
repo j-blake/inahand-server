@@ -118,4 +118,19 @@ suite('auth router', function authRouterSuite() {
       })
       .catch((err) => done(err));
   });
+
+  test('should return 204 with a valid session', function validSession(done) {
+    sinon.stub(sessionService, 'isValidSession').resolves(true);
+    agent.get('/api/auth/check').expect(204, done);
+  });
+
+  test('should return 401 with a missing session', function noValidSession(done) {
+    sinon.stub(sessionService, 'isValidSession').resolves(false);
+    agent.get('/api/auth/check').expect(401, done);
+  });
+
+  test('should return 401 on error thrown during session validation', function validSession(done) {
+    sinon.stub(sessionService, 'isValidSession').throws();
+    agent.get('/api/auth/check').expect(401, done);
+  });
 });

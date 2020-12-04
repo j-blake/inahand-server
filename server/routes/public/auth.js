@@ -78,8 +78,7 @@ router.post('/auth/logout', async (req, res) => {
 router.get('/auth/check', async (req, res) => {
   const { session } = req;
   try {
-    const identity = await userService.findOneById(session.identity);
-    const status = identity ? 204 : 401;
+    const status = (await sessionService.isValidSession(session)) ? 204 : 401;
     res.status(status);
   } catch (e) {
     res.status(401);

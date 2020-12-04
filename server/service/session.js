@@ -1,3 +1,5 @@
+const userService = require('./user');
+
 exports.saveSession = (session) => {
   return new Promise((resolve, reject) => {
     session.save((err) => {
@@ -20,3 +22,5 @@ exports.destroySession = (session) => {
     });
   });
 };
+
+exports.isValidSession = async (session) => userService.findById(session.id);
