@@ -1,35 +1,32 @@
 const { assert } = require('chai');
 const sinon = require('sinon');
 const express = require('express');
-const bodyParser = require('body-parser');
 const request = require('supertest');
 const authRouter = require('../server/routes/public/auth');
 const userService = require('../server/service/user');
 const passwordService = require('../server/service/password');
 const sessionService = require('../server/service/session');
-
-const app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-const sessionMiddleware = (req, res, next) => {
-  req.session = {};
-  next();
-};
-app.use(sessionMiddleware);
-app.use('/api', authRouter);
+const app = require('./mockApp');
 
 const agent = request.agent(app);
 
-const first = 'nathaniel';
-const last = 'tarp';
-const email = 'y@t.com';
-const password = 'passString';
-
 suite('auth router', function authRouterSuite() {
-  setup(function setup() {});
+  const first = 'nathaniel';
+  const last = 'tarp';
+  const email = 'y@t.com';
+  const password = 'passString';
+
+  suiteSetup(function suiteSetup() {
+    app.use('/api', authRouter);
+  });
 
   teardown(function teardown() {
     sinon.restore();
+  });
+
+  suiteTeardown(function suiteTeardown() {
+    // eslint-disable-next-line no-underscore-dangle
+    app._router.stack.pop();
   });
 
   test('should return first name, last name, email on successful user creation', function successfulUserCreation(done) {
