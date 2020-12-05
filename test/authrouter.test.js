@@ -17,14 +17,22 @@ suite('auth router', function authRouterSuite() {
   const password = 'passString';
 
   suiteSetup(function suiteSetup() {
+    app.use((req, res, done) => {
+      req.session = {};
+      done();
+    });
     app.use('/api', authRouter);
   });
+
+  setup(function setup() {});
 
   teardown(function teardown() {
     sinon.restore();
   });
 
   suiteTeardown(function suiteTeardown() {
+    // eslint-disable-next-line no-underscore-dangle
+    app._router.stack.pop();
     // eslint-disable-next-line no-underscore-dangle
     app._router.stack.pop();
   });
