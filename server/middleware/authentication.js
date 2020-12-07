@@ -15,7 +15,12 @@ module.exports = async (req, res, next) => {
   if (!session) {
     return handleUnauthorizedResponse(res);
   }
-  const identity = await userService.findOneById(session.identity);
+  let identity = null;
+  try {
+    identity = await userService.findById(session.identity);
+  } catch (e) {
+    // do nothing
+  }
   if (!identity) {
     return handleUnauthorizedResponse(res);
   }

@@ -4,16 +4,10 @@ const passwordService = require('./password');
 const userFactory = require('../model/factory/user');
 const Identity = require('../model/identity');
 
-exports.findOneById = async (id) => {
-  Identity.findById(id)
-    .populate({
-      path: 'profiles',
-      populate: { path: 'accounts' },
-    })
-    .exec();
+exports.findById = async (id) => {
+  const identity = await Identity.findById(id).exec();
+  return identity;
 };
-
-exports.findById = async (id) => Identity.findById(id);
 
 exports.createUser = async (firstName, lastName, email, hash) => {
   try {

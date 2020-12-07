@@ -12,7 +12,7 @@ suite('middleware - authentication', function authenticationSuite() {
   setup(function setup() {
     sinon.stub(res, 'append').returns(res);
     sinon.stub(res, 'send').returns(res);
-    sinon.stub(userService, 'findOneById');
+    sinon.stub(userService, 'findById');
   });
 
   teardown(function teardown() {
@@ -25,8 +25,8 @@ suite('middleware - authentication', function authenticationSuite() {
   });
 
   test('null identity returns 401', async function nullIdentity() {
-    req.session = { identity: 'narf' };
-    userService.findOneById.resolves(null);
+    req.session = { identity: 'goodIdentityName' };
+    userService.findById.resolves(null);
     await authentication(req, res, next);
     assert.equal(res.statusCode, 401);
   });
@@ -34,8 +34,8 @@ suite('middleware - authentication', function authenticationSuite() {
   test('valid session appends identity to request and calls next()', async function validSession() {
     const nextSpy = sinon.spy();
     const identity = { mockIdentity: 42 };
-    req.session = { identity: 'narf' };
-    userService.findOneById.resolves(identity);
+    req.session = { identity: 'goodIdentityName' };
+    userService.findById.resolves(identity);
     await authentication(req, res, nextSpy);
     assert.equal(req.identity, identity);
     assert.isTrue(nextSpy.calledOnce);
