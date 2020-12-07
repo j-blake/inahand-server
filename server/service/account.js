@@ -1,12 +1,16 @@
 const Account = require('../model/account');
 
-exports.findAll = async (req, res) => {
+exports.findAll = async (identity) => {
   try {
-    const { identity } = req;
-    const profile = identity.profiles[0];
-    return res.status(200).json({ accounts: profile.accounts });
+    await identity
+      .populate({
+        path: 'profiles',
+        populate: { path: 'accounts' },
+      })
+      .execPopulate();
+    return identity.profiles[0].accounts;
   } catch (err) {
-    return res.status(404).send();
+    return null;
   }
 };
 
@@ -48,20 +52,6 @@ exports.updateOne = async (req, res) => {
     account.isActive = Boolean(isActive);
     await account.save();
     return res.status(200).json({ account });
-  } catch (err) {
-    const { message } = err;
-    return res.status(400).json({ message });
-  }
-};
-
-exports.deleteOne = async (req, res) => {
-  try {
-    const account = await Account.findById(req.params.id).exec();
-    if (account === null) {
-      return res.status(404).send();
-    }
-    await account.remove();
-    return res.status(204).send();
   } catch (err) {
     const { message } = err;
     return res.status(400).json({ message });
