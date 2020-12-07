@@ -17,7 +17,7 @@ suite('account router', function accountRouterSuite() {
   });
 
   setup(function setup() {
-    sinon.stub(accountService, 'findAll');
+    sinon.stub(accountService);
   });
 
   teardown(function tearDown() {
@@ -37,5 +37,15 @@ suite('account router', function accountRouterSuite() {
   test('should return 404 if identity object is misshaped in request for all accounts', function allAccountsError(done) {
     accountService.findAll.throws();
     agent.get('/api/accounts').expect(404, done);
+  });
+
+  test('should return 200 when successfully adding a new account', function addAccount(done) {
+    accountService.add.resolves();
+    agent.post('/api/account').expect(201, done);
+  });
+
+  test('should return 400 when attempting to save new account fails', function addAccountError(done) {
+    accountService.add.throws();
+    agent.post('/api/account').expect(400, done);
   });
 });

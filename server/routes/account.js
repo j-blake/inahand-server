@@ -13,7 +13,19 @@ router.get('/accounts', async (req, res) => {
   }
 });
 
-router.post('/account', (req, res) => accountService.add(req, res));
+router.post('/account', async (req, res) => {
+  try {
+    const {
+      identity,
+      body: { data },
+    } = req;
+    const account = await accountService.add(identity, data);
+    return res.status(201).json({ account });
+  } catch (err) {
+    const { message } = err;
+    return res.status(400).json({ message });
+  }
+});
 
 router.patch('/account/:id', (req, res) => accountService.updateOne(req, res));
 

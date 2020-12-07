@@ -14,20 +14,14 @@ exports.findAll = async (identity) => {
   }
 };
 
-exports.add = async (req, res) => {
-  try {
-    const { identity } = req;
-    const profile = identity.profiles[0];
-    const account = new Account(req.body);
-    account.currentBalance = account.initialBalance;
-    await account.save();
-    profile.accounts.push(account);
-    await profile.save();
-    return res.status(201).json({ account });
-  } catch (err) {
-    const { message } = err;
-    return res.status(400).json({ message });
-  }
+exports.add = async (identity, data) => {
+  const profile = identity.profiles[0];
+  const account = new Account(data);
+  account.currentBalance = account.initialBalance;
+  await account.save();
+  profile.accounts.push(account);
+  await profile.save();
+  return account;
 };
 
 // todo separate concerns
