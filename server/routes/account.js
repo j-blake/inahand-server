@@ -27,6 +27,19 @@ router.post('/account', async (req, res) => {
   }
 });
 
-router.patch('/account/:id', (req, res) => accountService.updateOne(req, res));
+router.patch('/account/:id', async (req, res) => {
+  try {
+    const { identity } = req;
+    const account = await accountService.findAccount(identity, req.params.id);
+    if (!account) {
+      return res.status(404).send();
+    }
+    await accountService.save(account, req.body);
+    return res.status(200).json({ account });
+  } catch (err) {
+    const { message } = err;
+    return res.status(400).json({ message });
+  }
+});
 
 module.exports = router;

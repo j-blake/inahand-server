@@ -24,30 +24,23 @@ exports.add = async (identity, data) => {
   return account;
 };
 
-// todo separate concerns
-exports.updateOne = async (req, res) => {
-  try {
-    const { identity } = req;
-    const profile = identity.profiles[0];
-    const { accounts } = profile;
-    const account = accounts.find(a => a.id === req.params.id);
-    if (!account) {
-      return res.status(404).send();
-    }
-    const {
-      name = account.name,
-      currentBalance = account.currentBalance,
-      isActive = account.isActive,
-    } = req.body;
-    account.name = name || account.name;
-    account.currentBalance = Number.isInteger(Number.parseInt(currentBalance, 10))
-      ? currentBalance
-      : account.currentBalance;
-    account.isActive = Boolean(isActive);
-    await account.save();
-    return res.status(200).json({ account });
-  } catch (err) {
-    const { message } = err;
-    return res.status(400).json({ message });
+exports.findAccount = async (identity, id) => {
+  const profile = identity.profiles[0];
+  const { accounts } = profile;
+  const account = await Account.find(id);
+  return account;
+};
+
+/* eslint-disable no-param-reassign */
+exports.updateOne = async (account, data) => {
+  const { name, currentBalance, isActive } = data;
+  if (name) {
+    account.name = name;
   }
+  if (!Number.isNaN(Number.parseFloat(currentBalance))) {
+    account.currentBalance = Number.parseFloat(currentBalance, 10);
+  }
+  account.isActive = isActive === 'true';
+  await account.save();
+  return account;
 };

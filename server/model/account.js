@@ -17,14 +17,4 @@ const accountSchema = Schema(
   }
 );
 
-// todo handle the response
-accountSchema.statics.findAll = function findAll(callback) {
-  this.find((err, accounts) => {
-    if (err !== null) {
-      return callback(err);
-    }
-    return callback(null, accounts);
-  });
-};
-
 module.exports = mongoose.models.Account || model('Account', accountSchema);
