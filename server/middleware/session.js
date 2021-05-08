@@ -10,6 +10,7 @@ function initializeSessionMiddleware(mongooseConnection) {
     rolling: true,
     saveUninitialized: false,
     unset: 'destroy',
+    proxy:true,
     cookie: {
       httpOnly: true,
       secure: true,
