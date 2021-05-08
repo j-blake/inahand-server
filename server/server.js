@@ -6,5 +6,5 @@ const appInit = require('./app');
 
 appInit().then((app) => {
   const httpsServer = http.createServer(app);
-  httpsServer.listen(process.env.HTTP_PORT);
+  httpsServer.listen(process.env.PORT);
 });
