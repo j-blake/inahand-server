@@ -54,4 +54,4 @@ transactionSchema.statics.findByName = function findByName(transactionName, call
   return this.find({ description: transactionName.toUpperCase() }, callback);
 };
 
-module.exports = model('Transaction', transactionSchema);
+module.exports = mongoose.models.Transaction || model('Transaction', transactionSchema);

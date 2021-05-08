@@ -1,0 +1,13 @@
+env:
+  node: true
+  es6: true
+  mocha: true
+plugins:
+  - prettier
+rules:
+  prettier/prettier: error
+extends:
+  - eslint:recommended
+  - airbnb-base
+  - prettier
+  - plugin:mocha/recommended

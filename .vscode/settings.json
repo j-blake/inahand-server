@@ -3,5 +3,8 @@
   "eslint.options": {
     "parser": "babel-eslint"
   },
-  "debug.toolBarLocation": "docked"
+  "debug.toolBarLocation": "docked",
+  "cSpell.words": [
+    "inahand"
+  ]
 }

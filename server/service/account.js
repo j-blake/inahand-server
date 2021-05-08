@@ -1,69 +1,46 @@
 const Account = require('../model/account');
 
-exports.findAll = async (req, res) => {
+exports.findAll = async (identity) => {
   try {
-    const { identity } = req;
-    const profile = identity.profiles[0];
-    return res.status(200).json({ accounts: profile.accounts });
+    await identity
+      .populate({
+        path: 'profiles',
+        populate: { path: 'accounts' },
+      })
+      .execPopulate();
+    return identity.profiles[0].accounts;
   } catch (err) {
-    return res.status(404).send();
+    return null;
   }
 };
 
-exports.add = async (req, res) => {
-  try {
-    const { identity } = req;
-    const profile = identity.profiles[0];
-    const account = new Account(req.body);
-    account.currentBalance = account.initialBalance;
-    await account.save();
-    profile.accounts.push(account);
-    await profile.save();
-    return res.status(201).json({ account });
-  } catch (err) {
-    const { message } = err;
-    return res.status(400).json({ message });
-  }
+exports.add = async (identity, data) => {
+  const profile = identity.profiles[0];
+  const account = new Account(data);
+  account.currentBalance = account.initialBalance;
+  await account.save();
+  profile.accounts.push(account);
+  await profile.save();
+  return account;
 };
 
-// todo separate concerns
-exports.updateOne = async (req, res) => {
-  try {
-    const { identity } = req;
-    const profile = identity.profiles[0];
-    const { accounts } = profile;
-    const account = accounts.find(a => a.id === req.params.id);
-    if (!account) {
-      return res.status(404).send();
-    }
-    const {
-      name = account.name,
-      currentBalance = account.currentBalance,
-      isActive = account.isActive,
-    } = req.body;
-    account.name = name || account.name;
-    account.currentBalance = Number.isInteger(Number.parseInt(currentBalance, 10))
-      ? currentBalance
-      : account.currentBalance;
-    account.isActive = Boolean(isActive);
-    await account.save();
-    return res.status(200).json({ account });
-  } catch (err) {
-    const { message } = err;
-    return res.status(400).json({ message });
-  }
+exports.findAccount = async (identity, id) => {
+  const profile = identity.profiles[0];
+  const { accounts } = profile;
+  const account = await Account.find(id);
+  return account;
 };
 
-exports.deleteOne = async (req, res) => {
-  try {
-    const account = await Account.findById(req.params.id).exec();
-    if (account === null) {
-      return res.status(404).send();
-    }
-    await account.remove();
-    return res.status(204).send();
-  } catch (err) {
-    const { message } = err;
-    return res.status(400).json({ message });
+/* eslint-disable no-param-reassign */
+exports.updateOne = async (account, data) => {
+  const { name, currentBalance, isActive } = data;
+  if (name) {
+    account.name = name;
   }
+  if (!Number.isNaN(Number.parseFloat(currentBalance))) {
+    account.currentBalance = Number.parseFloat(currentBalance, 10);
+  }
+  account.isActive = isActive === 'true';
+  await account.save();
+  return account;
 };

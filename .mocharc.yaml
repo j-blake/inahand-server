@@ -1,0 +1,5 @@
+ui: tdd
+watch: true
+watch-files:
+  - 'server/**/*.js'
+  - 'test/**/*.js'
