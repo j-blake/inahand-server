@@ -1,12 +1,11 @@
 const session = require('express-session');
-const connectMongo = require('connect-mongo');
+const MongoStore = require('connect-mongo');
 
-const MongoStore = connectMongo(session);
 function initializeSessionMiddleware(mongooseConnection) {
   return session({
     name: process.env.COOKIE_NAME,
     secret: process.env.CONNECT_MONGO_SECRET,
-    store: new MongoStore({ mongooseConnection }),
+    store: MongoStore.create({ client: mongooseConnection.getClient() }),
     resave: true,
     rolling: true,
     saveUninitialized: false,
