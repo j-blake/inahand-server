@@ -2,12 +2,19 @@ env:
   node: true
   es6: true
   mocha: true
+parser: "@typescript-eslint/parser"
 plugins:
   - prettier
+  - "@typescript-eslint"
 rules:
   prettier/prettier: error
+  "@typescript-eslint/no-var-requires": 1
+  no-console: 1
 extends:
   - eslint:recommended
-  - airbnb-base
-  - prettier
+  - plugin:@typescript-eslint/recommended
+  - plugin:prettier/recommended
   - plugin:mocha/recommended
+ignorePatterns: [
+  "/dist/**/*"
+]

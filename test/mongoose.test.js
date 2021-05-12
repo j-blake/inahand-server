@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const sinon = require('sinon');
 const mongoose = require('mongoose');
-const connectMongoose = require('../server/mongoose');
+const connectMongoose = require('../server/mongoose').default;
 
 suite('mongoose', function mongooseSuite() {
   setup(function setup() {
@@ -12,7 +12,6 @@ suite('mongoose', function mongooseSuite() {
   teardown(function teardown() {
     mongoose.connect.restore();
     process.exit.restore();
-    // eslint-disable-next-line no-console
     console.error.restore();
   });
   test('mongoose connects to MongoDB', async function connectionSuccess() {

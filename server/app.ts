@@ -1,16 +1,17 @@
-const express = require('express');
-const path = require('path');
-const morgan = require('morgan');
-const cors = require('cors');
-const helmet = require('helmet');
-const YAML = require('yamljs');
-const swaggerUI = require('swagger-ui-express');
-const connectMongoose = require('./mongoose');
-const sessionMiddleware = require('./middleware/session');
-const routes = require('./routes');
+import express from 'express';
+import path from 'path';
+import morgan from 'morgan';
+import cors from 'cors';
+import helmet from 'helmet';
+import YAML from 'yamljs';
+import swaggerUI from 'swagger-ui-express';
+import connectMongoose from './mongoose';
+import sessionMiddleware from './middleware/session';
+import routes from './routes';
 
 const setupApp = async () => {
   const app = express();
+  app.enable('trust proxy');
   app.use(
     cors({
       origin: ['http://localhost:3001'],
@@ -41,11 +42,10 @@ const setupApp = async () => {
   app.use('/api', routes);
 
   // Catch all other routes and return the index file
-  app.get('*', (req, res) =>
+  app.get('*', (_, res) =>
     res.sendFile(path.join(__dirname, 'dist/index.html'))
   );
   return app;
 };
 
-const init = () => setupApp();
-module.exports = init;
+export default (): Promise<express.Express> => setupApp();

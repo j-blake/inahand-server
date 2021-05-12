@@ -1,16 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const express = require('express');
+import fs from 'fs';
+import path from 'path';
+import express from 'express';
 const authMiddleware = require('../middleware/authentication');
 
-const filterRoutesInDirectory = (dir) =>
+const filterRoutesInDirectory = (dir: string) =>
   fs
     .readdirSync(dir)
-    .filter(
-      (file) =>
-        file.toLowerCase().indexOf('.js') !== -1 && !file.startsWith('index')
-    )
-    /* eslint-disable-next-line global-require, import/no-dynamic-require */
+    .filter((file) => path.extname(file) === '.js' && !file.startsWith('index'))
     .map((file) => require(path.join(dir, path.basename(file, '.js'))));
 
 const router = express.Router();
@@ -21,4 +17,4 @@ const protectedRoutes = filterRoutesInDirectory(protectedDirectory);
 
 router.use([...publicRoutes, authMiddleware, ...protectedRoutes]);
 
-module.exports = router;
+export default router;
