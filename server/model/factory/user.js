@@ -1,5 +1,5 @@
-const Identity = require('../identity');
-const Profile = require('../profile');
+const Identity = require('../identity').default;
+const Profile = require('../profile').default;
 
 exports.createUser = (firstName, lastName, email, passwordHash) => {
   const profileDoc = new Profile();

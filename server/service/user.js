@@ -2,7 +2,7 @@ const useragent = require('useragent');
 
 const passwordService = require('./password');
 const userFactory = require('../model/factory/user');
-const Identity = require('../model/identity');
+const Identity = require('../model/identity').default;
 
 exports.findById = async (id) => {
   const identity = await Identity.findById(id).exec();

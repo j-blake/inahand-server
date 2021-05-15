@@ -3,7 +3,7 @@ import { Profile } from './profile';
 export interface User {
   firstName: string;
   lastName: string;
-  emailAddress: string;
+  email: string;
   passwordHash: string;
   profiles: Profile[];
   isActive: boolean;

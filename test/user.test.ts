@@ -1,24 +1,27 @@
 const { assert } = require('chai');
-const sinon = require('sinon');
-const mongoose = require('mongoose');
+import sinon, { SinonStub } from 'sinon';
+import mongoose from 'mongoose';
 const userService = require('../server/service/user');
-const passwordService = require('../server/service/password');
-const Identity = require('../server/model/identity');
-
-const name = 'yakkster';
-const mock = new Identity();
-mock.email = 'yark@tarp.com';
-mock.firstName = name;
-mock.passwordHash = 'hashpass';
+import * as passwordService from '../server/service/password';
+import { MongooseIdentity } from '../server/model/identity';
 
 suite('user service', function userSuite() {
+  let mock: MongooseIdentity;
   setup(function setup() {
+    const identityModel = mongoose.model('Identity');
+    const name = 'yakkster';
+    mock = new identityModel() as MongooseIdentity;
+    mock.email = 'yark@tarp.com';
+    mock.firstName = name;
+    mock.passwordHash = 'hashpass';
     mongoose.Model.prototype.save = sinon.stub().resolves();
     mongoose.Query.prototype.exec = sinon.stub().resolves();
   });
 
   teardown(function teardown() {
     sinon.restore();
+    delete mongoose.models.Identity;
+    delete mongoose.models.Profile;
   });
 
   test('should return object on successful user creation', async function createUser() {
@@ -51,19 +54,19 @@ suite('user service', function userSuite() {
   });
 
   test('should return null if password is incorrect', async function incorrectPassword() {
-    mongoose.Query.prototype.exec.resolves(mock);
+    (mongoose.Query.prototype.exec as SinonStub).resolves(mock);
     const identity = await userService.findByAuthentication('email', 'pass');
     assert.isNull(identity);
   });
 
   test('should return null if exception is thrown', async function throwsException() {
-    mongoose.Query.prototype.exec.throws();
+    (mongoose.Query.prototype.exec as SinonStub).throws();
     const identity = await userService.findByAuthentication('email', 'pass');
     assert.isNull(identity);
   });
 
   test('should return identity document if valid email address and password provided', async function validAuthentication() {
-    mongoose.Query.prototype.exec.resolves(mock);
+    (mongoose.Query.prototype.exec as SinonStub).resolves(mock);
     sinon.stub(passwordService, 'authenticatePassword').resolves(true);
     const identity = await userService.findByAuthentication('email', 'pass');
     assert.isObject(identity);
