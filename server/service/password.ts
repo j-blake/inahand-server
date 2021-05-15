@@ -1,7 +1,9 @@
-const bcrypt = require('bcryptjs');
+import bcrypt from 'bcryptjs';
 const PasswordError = require('../error/password');
 
-exports.createPasswordHash = async (plaintextPassword) => {
+export const createPasswordHash = async (
+  plaintextPassword: string
+): Promise<string> => {
   if (!/^[\w!@#$%^&*()-+=]{20,40}$/.test(plaintextPassword)) {
     throw new PasswordError(
       'passwords must be 20 to 40 alphanumeric and !@#$%&*()_-+= characters'
@@ -9,10 +11,13 @@ exports.createPasswordHash = async (plaintextPassword) => {
   }
   return bcrypt.hash(
     plaintextPassword,
-    parseInt(process.env.BCRYPT_SALT_ROUNDS, 10)
+    parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10)
   );
 };
 
-exports.authenticatePassword = async (password, hash) => {
+export const authenticatePassword = async (
+  password: string,
+  hash: string
+): Promise<boolean> => {
   return bcrypt.compare(password, hash);
 };
