@@ -45,14 +45,19 @@ suite('account service', function accountServiceSuite() {
     mongoose.Model.prototype.save = sinon.stub().resolves();
     const account = await accountService.add(identity, {
       name: 'Bank of Mongo',
+      currentBalance: 50,
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
+      initialBalance: 100,
+      isActive: true
     });
     assert.isObject(account);
-    assert.equal(profile.accounts[0].name, account.name);
+    assert.equal(profile.accounts[0].name, account?.name);
   });
 
   test('should throw if saving account fails', async function addAccountFailure() {
     mongoose.Model.prototype.save = sinon.stub().throws();
-    assert.isRejected(accountService.add(identity, {}));
+    assert.isRejected(accountService.add(identity, {} as Account));
   });
 
   test('should update account record', async function udpateAccount() {
@@ -63,9 +68,9 @@ suite('account service', function accountServiceSuite() {
       isActive: true,
     });
     const name = 'new name';
-    const isActive = 'false';
-    const currentBalance = '50.95';
-    const initialBalance = '1000000';
+    const isActive = false;
+    const currentBalance = 50.95;
+    const initialBalance = 1000000;
     mongoose.Model.prototype.save = sinon.stub().resolves(
       new AccountModel({
         name,
@@ -79,6 +84,8 @@ suite('account service', function accountServiceSuite() {
       isActive,
       currentBalance,
       initialBalance,
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
     });
     assert.equal(updatedAccount.name, 'new name');
     assert.equal(updatedAccount.currentBalance, 50.95);
