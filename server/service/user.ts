@@ -1,15 +1,23 @@
-const useragent = require('useragent');
+import useragent from 'useragent';
 
-const passwordService = require('./password');
-const userFactory = require('../model/factory/user');
-const Identity = require('../model/identity').default;
+import * as passwordService from './password';
+import * as userFactory from '../model/factory/user';
+import Identity from '../model/identity';
+import { ObjectId } from 'bson';
+import { User } from '../@types/user';
+import { UserAgent } from '../@types/userAgent';
 
-exports.findById = async (id) => {
+export const findById = async (id: ObjectId): Promise<User> => {
   const identity = await Identity.findById(id).exec();
   return identity;
 };
 
-exports.createUser = async (firstName, lastName, email, hash) => {
+export const createUser = async (
+  firstName: User['firstName'],
+  lastName: User['lastName'],
+  email: User['email'],
+  hash: User['passwordHash']
+): Promise<User | null> => {
   try {
     const identity = userFactory.createUser(firstName, lastName, email, hash);
     await identity.save();
@@ -20,7 +28,10 @@ exports.createUser = async (firstName, lastName, email, hash) => {
   }
 };
 
-exports.findByAuthentication = async (email, password) => {
+export const findByAuthentication = async (
+  email: User['email'],
+  password: User['passwordHash']
+): Promise<User | null> => {
   try {
     const identity = await Identity.findOne({ email }).exec();
     if (!identity) {
@@ -41,7 +52,10 @@ exports.findByAuthentication = async (email, password) => {
   }
 };
 
-exports.createUserAgentDocument = (agentHeader, remoteAddress) => {
+export const createUserAgentDocument = (
+  agentHeader: string,
+  remoteAddress: string
+): UserAgent => {
   const agent = useragent.parse(agentHeader);
   return {
     agent: agent.toString(),

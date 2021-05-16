@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-const PasswordError = require('../error/password');
+import PasswordError from '../error/password';
 
 export const createPasswordHash = async (
   plaintextPassword: string

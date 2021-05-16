@@ -1,7 +1,7 @@
-const { assert } = require('chai');
+import { assert } from 'chai';
 import sinon, { SinonStub } from 'sinon';
 import mongoose from 'mongoose';
-const userService = require('../server/service/user');
+import * as userService from '../server/service/user';
 import * as passwordService from '../server/service/password';
 import { MongooseIdentity } from '../server/model/identity';
 
@@ -31,12 +31,12 @@ suite('user service', function userSuite() {
     const hash = 'hashting';
     const identity = await userService.createUser(first, last, email, hash);
     assert.isObject(identity);
-    assert.equal(first, identity.firstName);
-    assert.equal(last, identity.lastName);
-    assert.equal(hash, identity.passwordHash);
-    assert.equal(1, identity.profiles.length);
-    assert.isObject(identity.profiles[0]);
-    assert.isEmpty(identity.profiles[0].accounts);
+    assert.equal(first, identity?.firstName);
+    assert.equal(last, identity?.lastName);
+    assert.equal(hash, identity?.passwordHash);
+    assert.equal(1, identity?.profiles.length);
+    assert.isObject(identity?.profiles[0]);
+    assert.isEmpty(identity?.profiles[0].accounts);
   });
 
   test('should return null on unsuccessful user creation', async function unsuccessfulCreateUser() {

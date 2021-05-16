@@ -10,6 +10,7 @@ rules:
   prettier/prettier: error
   "@typescript-eslint/no-var-requires": 1
   no-console: 1
+  no-unsafe-optional-chaining: 2
 extends:
   - eslint:recommended
   - plugin:@typescript-eslint/recommended
