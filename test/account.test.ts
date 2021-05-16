@@ -1,12 +1,15 @@
-const { assert } = require('chai').use(require('chai-as-promised'));
+import chai, { assert } from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 import mongoose from 'mongoose';
 import { Account } from '../server/@types/account';
 import { Category } from '../server/@types/category';
-const sinon = require('sinon');
-const accountService = require('../server/service/account');
+import sinon from 'sinon';
+import * as accountService from '../server/service/account';
 import { MongooseIdentity } from '../server/model/identity';
 import { MongooseProfile } from '../server/model/profile';
-const Account = require('../server/model/account');
+import AccountModel from '../server/model/account';
+
+chai.use(chaiAsPromised);
 
 suite('account service', function accountServiceSuite() {
   let identity: MongooseIdentity;
@@ -53,7 +56,7 @@ suite('account service', function accountServiceSuite() {
   });
 
   test('should update account record', async function udpateAccount() {
-    const account = new Account({
+    const account = new AccountModel({
       name: 'old name',
       initialBalance: 100,
       currentBalance: 50,
@@ -63,11 +66,14 @@ suite('account service', function accountServiceSuite() {
     const isActive = 'false';
     const currentBalance = '50.95';
     const initialBalance = '1000000';
-    mongoose.Model.prototype.save = sinon
-      .stub()
-      .resolves(
-        new Account({ name, initialBalance: 100, isActive, currentBalance })
-      );
+    mongoose.Model.prototype.save = sinon.stub().resolves(
+      new AccountModel({
+        name,
+        initialBalance: 100,
+        isActive,
+        currentBalance,
+      })
+    );
     const updatedAccount = await accountService.updateOne(account, {
       name,
       isActive,
