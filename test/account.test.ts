@@ -33,12 +33,6 @@ suite('account service', function accountServiceSuite() {
 
   teardown(function teardown() {
     sinon.restore();
-    delete mongoose.models.Identity;
-    delete mongoose.models.Profile;
-  });
-
-  suiteTeardown(function suiteTeardown() {
-    sinon.restore();
   });
 
   test('should return document on successful account creation', async function addAccountSuccess() {
@@ -49,7 +43,7 @@ suite('account service', function accountServiceSuite() {
       dateCreated: new Date(),
       dateUpdated: new Date(),
       initialBalance: 100,
-      isActive: true
+      isActive: true,
     });
     assert.isObject(account);
     assert.equal(profile.accounts[0].name, account?.name);

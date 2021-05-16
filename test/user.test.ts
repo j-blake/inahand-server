@@ -20,8 +20,6 @@ suite('user service', function userSuite() {
 
   teardown(function teardown() {
     sinon.restore();
-    delete mongoose.models.Identity;
-    delete mongoose.models.Profile;
   });
 
   test('should return object on successful user creation', async function createUser() {

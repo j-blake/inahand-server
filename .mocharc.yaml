@@ -8,5 +8,7 @@ watch-files:
   - 'test/**/*.js'
   - 'server/**/*.ts'
   - 'test/**/*.ts'
-require: "ts-node/register"
 package: "tsconfig.json"
+require:
+  - ts-node/register
+  - test/hooks.ts
