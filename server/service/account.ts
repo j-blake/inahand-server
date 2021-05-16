@@ -23,6 +23,7 @@ export const findAll = async (
 
 export const add = async (
   identity: User,
+  // todo fix - needs to be strings from request
   data: Account
 ): Promise<Account | null> => {
   const profile = identity.profiles[0];
@@ -48,6 +49,7 @@ export const findAccount = async (
 
 export const updateOne = async (
   account: MongooseAccount,
+  // todo fix - needs to be strings from request
   data: Account
 ): Promise<Account> => {
   const { name, currentBalance, isActive } = data;

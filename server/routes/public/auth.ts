@@ -1,5 +1,5 @@
 import { forEach } from 'lodash';
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import { createPasswordHash } from '../../service/password';
 import {
   createUser,
@@ -11,11 +11,15 @@ import {
   destroySession,
   isValidSession,
 } from '../../service/session';
+import { SerializableError } from '../../@types/serializableError';
+import { Session } from '../../@types/session';
 
 const router = Router();
 
-function formatValidationErrors(e) {
-  const errors = {};
+function formatValidationErrors(e: SerializableError) {
+  const errors = {} as {
+    [path: string]: string;
+  };
   try {
     forEach(e.toJSON().errors, (value, path) => {
       errors[path] = value.message;
@@ -38,7 +42,7 @@ router.post('/auth/create', async (req, res) => {
   }
 });
 
-router.post('/auth/login', async (req, res) => {
+router.post('/auth/login', async (req: Request, res: Response) => {
   try {
     const {
       body: { email, password },
@@ -54,10 +58,10 @@ router.post('/auth/login', async (req, res) => {
         .send();
     }
     const {
-      session,
       headers: { 'user-agent': agentHeader },
       connection: { remoteAddress },
     } = req;
+    const session: Session = req.session as Session;
     session.identity = identity.id;
     session.userAgent = createUserAgentDocument(agentHeader, remoteAddress);
     await saveSession(session);

@@ -3,11 +3,10 @@ import useragent from 'useragent';
 import * as passwordService from './password';
 import * as userFactory from '../model/factory/user';
 import Identity from '../model/identity';
-import { ObjectId } from 'bson';
 import { User } from '../@types/user';
 import { UserAgent } from '../@types/userAgent';
 
-export const findById = async (id: ObjectId): Promise<User> => {
+export const findById = async (id: string): Promise<User> => {
   const identity = await Identity.findById(id).exec();
   return identity;
 };
@@ -53,14 +52,14 @@ export const findByAuthentication = async (
 };
 
 export const createUserAgentDocument = (
-  agentHeader: string,
-  remoteAddress: string
+  agentHeader: string | undefined,
+  remoteAddress: string | undefined
 ): UserAgent => {
   const agent = useragent.parse(agentHeader);
   return {
     agent: agent.toString(),
     os: agent.os.toString(),
     device: agent.device.toString(),
-    ipAddress: remoteAddress,
+    ipAddress: remoteAddress ?? '',
   };
 };

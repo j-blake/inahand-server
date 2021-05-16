@@ -71,6 +71,9 @@
   "include": [
     "./server.ts",
     "./server",
-    // "./test",
-  ]
+    "./server/@types/processEnv.d.ts"
+  ],
+  "ts-node": {
+    "files": true
+  }
 }

@@ -9,6 +9,7 @@ import validator from 'validator';
 import { User } from '../@types/user';
 
 export interface MongooseIdentity extends User, Document {
+  id: string;
   _id: Types.ObjectId;
 }
 

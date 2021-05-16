@@ -2,11 +2,13 @@ const { assert } = require('chai');
 const sinon = require('sinon');
 const express = require('express');
 const userService = require('../server/service/user');
-const authentication = require('../server/middleware/authentication');
+const authentication = require('../server/middleware/authentication').default;
 
 const req = Object.create(express.request);
 const res = Object.create(express.response);
-const next = () => {};
+const next = () => {
+  // do nothing
+};
 
 suite('middleware - authentication', function authenticationSuite() {
   setup(function setup() {
