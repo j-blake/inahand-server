@@ -1,8 +1,18 @@
-const mongoose = require('mongoose');
+import { ObjectId } from 'bson';
+import {
+  Schema,
+  model,
+  Document,
+  PreMiddlewareFunction,
+  CallbackError,
+} from 'mongoose';
+import { Category } from '../@types/category';
 
-const { Schema, model } = mongoose;
+export interface MongooseCategory extends Category, Document {
+  _id: ObjectId;
+}
 
-const categorySchema = Schema(
+const categorySchema = new Schema<MongooseCategory>(
   {
     name: {
       type: String,
@@ -24,17 +34,20 @@ const categorySchema = Schema(
   }
 );
 
-async function preRemove(next) {
+const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRremove(
+  this: MongooseCategory,
+  next: (err?: CallbackError) => void
+): Promise<void> {
   const Category = model('Category');
   const categories = await Category.find({ parent: this.id }).exec();
   categories.forEach((category) => {
     category.remove();
   });
   return next();
-}
-categorySchema.pre('remove', preRemove);
+};
+categorySchema.pre<MongooseCategory>('remove', preRemove);
 
-function transformToObject(doc) {
+function transformToObject(doc: MongooseCategory) {
   return {
     id: doc.id,
     name: doc.name,
@@ -43,4 +56,4 @@ function transformToObject(doc) {
 }
 categorySchema.set('toObject', { transform: transformToObject });
 
-module.exports = mongoose.models.Category || model('Category', categorySchema);
+export default model('Category', categorySchema);
