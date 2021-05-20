@@ -76,7 +76,7 @@ router.post('/auth/logout', async (req, res) => {
   const { session } = req;
   if (session) {
     try {
-      await destroySession(session);
+      await destroySession(session as Session);
     } catch (e) {
       // todo log error
     }
@@ -87,7 +87,7 @@ router.post('/auth/logout', async (req, res) => {
 router.get('/auth/check', async (req, res) => {
   const { session } = req;
   try {
-    const status = (await isValidSession(session)) ? 204 : 401;
+    const status = (await isValidSession(session as Session)) ? 204 : 401;
     res.status(status);
   } catch (e) {
     res.status(401);

@@ -5,7 +5,7 @@ import { agent as _agent } from 'supertest';
 import authRouter from '../server/routes/public/auth';
 import * as userService from '../server/service/user';
 import * as passwordService from '../server/service/password';
-import sessionService, { destroySession } from '../server/service/session';
+import * as sessionService from '../server/service/session';
 import app, { use, _router } from './mockApp';
 
 const agent = _agent(app);
@@ -105,7 +105,7 @@ suite('auth router', function authRouterSuite() {
       .post('/api/auth/logout')
       .expect(204)
       .then(() => {
-        assert(destroySession.calledOnce);
+        assert(sessionService.destroySession.calledOnce);
         assert(_response.clearCookie.calledOnce);
         done();
       })
@@ -119,7 +119,7 @@ suite('auth router', function authRouterSuite() {
       .post('/api/auth/logout')
       .expect(204)
       .then(() => {
-        assert(destroySession.calledOnce);
+        assert(sessionService.destroySession.calledOnce);
         assert(_response.clearCookie.calledOnce);
         done();
       })
