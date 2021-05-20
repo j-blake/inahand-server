@@ -1,12 +1,14 @@
-const express = require('express');
-const accountService = require('../service/account');
+import express from 'express';
+import { Request as IdentityRequest } from '../@types/request';
+import { MongooseIdentity } from '../model/identity';
+import * as accountService from '../service/account';
 
 const router = express.Router();
 
 router.get('/accounts', async (req, res) => {
   try {
-    const { identity } = req;
-    const accounts = await accountService.findAll(identity);
+    const { identity } = req as IdentityRequest;
+    const accounts = await accountService.findAll(identity as MongooseIdentity);
     return res.status(200).json({ accounts });
   } catch (err) {
     return res.status(404).send();
@@ -18,7 +20,7 @@ router.post('/account', async (req, res) => {
     const {
       identity,
       body: { data },
-    } = req;
+    } = req as IdentityRequest;
     const account = await accountService.add(identity, data);
     return res.status(201).json({ account });
   } catch (err) {
@@ -29,12 +31,12 @@ router.post('/account', async (req, res) => {
 
 router.patch('/account/:id', async (req, res) => {
   try {
-    const { identity } = req;
+    const { identity } = req as IdentityRequest;
     const account = await accountService.findAccount(identity, req.params.id);
     if (!account) {
       return res.status(404).send();
     }
-    await accountService.save(account, req.body);
+    await accountService.updateOne(account, req.body);
     return res.status(200).json({ account });
   } catch (err) {
     const { message } = err;

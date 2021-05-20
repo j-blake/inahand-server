@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { Account } from '../@types/account';
 import { User } from '../@types/user';
 import AccountModel, { MongooseAccount } from '../model/account';
@@ -35,20 +34,21 @@ export const add = async (
   return account;
 };
 
+// todo fix or remove
 export const findAccount = async (
   identity: User,
-  id: ObjectId
+  id: string
 ): Promise<Account | undefined> => {
   const profile = identity.profiles[0];
   const { accounts } = profile;
   const account = accounts.find(
-    (account) => (account as MongooseAccount)._id === id
+    (account) => (account as MongooseAccount).id === id
   );
   return account;
 };
 
 export const updateOne = async (
-  account: MongooseAccount,
+  account: Account,
   // todo fix - needs to be strings from request
   data: Account
 ): Promise<Account> => {
@@ -60,6 +60,7 @@ export const updateOne = async (
     account.currentBalance = Number.parseFloat(currentBalance.toString());
   }
   account.isActive = ((isActive as unknown) as string) === 'true';
-  await account.save();
+  // todo create repo layer
+  await (account as MongooseAccount).save();
   return account;
 };
