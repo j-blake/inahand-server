@@ -39,7 +39,9 @@ const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRre
   next: (err?: CallbackError) => void
 ): Promise<void> {
   const Category = model('Category');
-  const categories = await Category.find({ parent: this.id }).exec();
+  const categories: MongooseCategory[] = await Category.find({
+    parent: this.id,
+  }).exec();
   categories.forEach((category) => {
     category.remove();
   });
