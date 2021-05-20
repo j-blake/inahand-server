@@ -1,12 +1,15 @@
 import { assert } from 'chai';
-import { restore, stub, spy } from 'sinon';
+import { restore, stub, spy, SinonStub } from 'sinon';
 import { response as _response } from 'express';
 import { agent as _agent } from 'supertest';
 import authRouter from '../server/routes/public/auth';
 import * as userService from '../server/service/user';
 import * as passwordService from '../server/service/password';
 import * as sessionService from '../server/service/session';
-import app, { use, _router } from './mockApp';
+import app from './mockApp';
+import { Session } from '../server/@types/session';
+import { User } from '../server/@types/user';
+import { UserAgent } from '../server/@types/userAgent';
 
 const agent = _agent(app);
 
@@ -16,12 +19,31 @@ suite('auth router', function authRouterSuite() {
   const email = 'y@t.com';
   const password = 'passString';
 
+  const userMock: User = {
+    id: '123',
+    passwordHash: 'hashahash',
+    firstName: first,
+    lastName: last,
+    email,
+    isActive: true,
+    profiles: [],
+    dateCreated: new Date(),
+    dateUpdated: new Date(),
+  };
+
+  const userAgentMock: UserAgent = {
+    agent: 'agent',
+    device: 'a good one',
+    ipAddress: 'localhost',
+    os: 'thingOS',
+  };
+
   suiteSetup(function suiteSetup() {
-    use((req, res, done) => {
-      req.session = {};
+    app.use((req, _, done) => {
+      req.session = {} as Session;
       done();
     });
-    use('/api', authRouter);
+    app.use('/api', authRouter);
   });
 
   setup(function setup() {
@@ -34,18 +56,14 @@ suite('auth router', function authRouterSuite() {
 
   suiteTeardown(function suiteTeardown() {
     // eslint-disable-next-line no-underscore-dangle
-    _router.stack.pop();
+    app._router.stack.pop();
     // eslint-disable-next-line no-underscore-dangle
-    _router.stack.pop();
+    app._router.stack.pop();
   });
 
   test('should return first name, last name, email on successful user creation', function successfulUserCreation(done) {
     stub(passwordService, 'createPasswordHash').resolves('passwordHash');
-    stub(userService, 'createUser').resolves({
-      firstName: first,
-      lastName: last,
-      email,
-    });
+    stub(userService, 'createUser').resolves(userMock);
     agent
       .post('/api/auth/create')
       .send({
@@ -79,9 +97,12 @@ suite('auth router', function authRouterSuite() {
   });
 
   test('should return 200 on valid login', function validLoginAttempt(done) {
-    stub(userService, 'findByAuthentication').resolves({ id: 42 });
-    stub(userService, 'createUserAgentDocument').returns();
-    stub(sessionService, 'saveSession').resolves(true);
+    stub(userService, 'findByAuthentication').resolves({
+      ...userMock,
+      id: '42',
+    });
+    stub(userService, 'createUserAgentDocument').returns(userAgentMock);
+    stub(sessionService, 'saveSession').resolves();
     agent
       .post('/api/auth/login')
       .send({
@@ -92,8 +113,11 @@ suite('auth router', function authRouterSuite() {
   });
 
   test('should return 400 on login if session save fails', function missingPassword(done) {
-    stub(userService, 'findByAuthentication').resolves({ id: 7 });
-    stub(userService, 'createUserAgentDocument').returns();
+    stub(userService, 'findByAuthentication').resolves({
+      ...userMock,
+      id: '7',
+    });
+    stub(userService, 'createUserAgentDocument').returns(userAgentMock);
     stub(sessionService, 'saveSession').throws();
     agent.post('/api/auth/login').send({ email }).expect(400, done);
   });
@@ -105,8 +129,8 @@ suite('auth router', function authRouterSuite() {
       .post('/api/auth/logout')
       .expect(204)
       .then(() => {
-        assert(sessionService.destroySession.calledOnce);
-        assert(_response.clearCookie.calledOnce);
+        assert((sessionService.destroySession as SinonStub).calledOnce);
+        assert((_response.clearCookie as SinonStub).calledOnce);
         done();
       })
       .catch((err) => done(err));
@@ -119,20 +143,20 @@ suite('auth router', function authRouterSuite() {
       .post('/api/auth/logout')
       .expect(204)
       .then(() => {
-        assert(sessionService.destroySession.calledOnce);
-        assert(_response.clearCookie.calledOnce);
+        assert((sessionService.destroySession as SinonStub).calledOnce);
+        assert((_response.clearCookie as SinonStub).calledOnce);
         done();
       })
       .catch((err) => done(err));
   });
 
   test('should return 204 with a valid session', function validSession(done) {
-    stub(sessionService, 'isValidSession').resolves(true);
+    stub(sessionService, 'isValidSession').resolves(userMock);
     agent.get('/api/auth/check').expect(204, done);
   });
 
   test('should return 401 with a missing session', function noValidSession(done) {
-    stub(sessionService, 'isValidSession').resolves(false);
+    stub(sessionService, 'isValidSession').resolves(undefined);
     agent.get('/api/auth/check').expect(401, done);
   });
 
