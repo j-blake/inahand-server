@@ -4,9 +4,9 @@ exports.findAll = async (req, res) => {
   try {
     const { identity } = req;
     const profile = identity.profiles[0];
-    const jsonCategories = await Category
-      .find({ profile: profile.id })
-      .then(categories => categories.map(category => category.toObject()));
+    const jsonCategories = await Category.find({
+      profile: profile.id,
+    }).then((categories) => categories.map((category) => category.toObject()));
     return res.status(200).json({ categories: jsonCategories });
   } catch (err) {
     return res.status(404).send();
