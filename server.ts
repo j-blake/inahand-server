@@ -1,8 +1,8 @@
 // Get dependencies
-require('dotenv').config();
-const path = require('path');
-const http = require('http');
-const appInit = require('./app');
+import dotenv from 'dotenv';
+dotenv.config();
+import http from 'http';
+import appInit from './server/app';
 
 appInit().then((app) => {
   const httpsServer = http.createServer(app);

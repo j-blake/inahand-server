@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-async function createMongooseConnection() {
-  const uri = process.env.DB_CONNECTION;
+async function createMongooseConnection(): Promise<mongoose.Connection> {
+  const uri = process.env.DB_CONNECTION || '';
   const options = {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -17,4 +16,5 @@ async function createMongooseConnection() {
     return process.exit(1);
   }
 }
-module.exports = createMongooseConnection;
+
+export default createMongooseConnection;

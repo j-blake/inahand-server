@@ -1,5 +1,14 @@
 ui: tdd
+extension:
+  - js
+  - ts
 watch: true
 watch-files:
   - 'server/**/*.js'
   - 'test/**/*.js'
+  - 'server/**/*.ts'
+  - 'test/**/*.ts'
+package: "tsconfig.json"
+require:
+  - ts-node/register
+  - test/hooks.ts

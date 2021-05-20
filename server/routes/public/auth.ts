@@ -1,15 +1,27 @@
-const _ = require('lodash');
-const express = require('express');
-const passwordService = require('../../service/password');
-const userService = require('../../service/user');
-const sessionService = require('../../service/session');
+import { forEach } from 'lodash';
+import { Request, Response, Router } from 'express';
+import { createPasswordHash } from '../../service/password';
+import {
+  createUser,
+  findByAuthentication,
+  createUserAgentDocument,
+} from '../../service/user';
+import {
+  saveSession,
+  destroySession,
+  isValidSession,
+} from '../../service/session';
+import { SerializableError } from '../../@types/serializableError';
+import { Session } from '../../@types/session';
 
-const router = express.Router();
+const router = Router();
 
-function formatValidationErrors(e) {
-  const errors = {};
+function formatValidationErrors(e: SerializableError) {
+  const errors = {} as {
+    [path: string]: string;
+  };
   try {
-    _.forEach(e.toJSON().errors, (value, path) => {
+    forEach(e.toJSON().errors, (value, path) => {
       errors[path] = value.message;
     });
   } catch (err) {
@@ -22,20 +34,20 @@ router.post('/auth/create', async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
     // todo simplify and remove custom exception; validate first then create hash
-    const hash = await passwordService.createPasswordHash(password);
-    const user = await userService.createUser(firstName, lastName, email, hash);
+    const hash = await createPasswordHash(password);
+    const user = await createUser(firstName, lastName, email, hash);
     return res.status(201).json({ user });
   } catch (e) {
     return res.status(400).json({ errors: formatValidationErrors(e) });
   }
 });
 
-router.post('/auth/login', async (req, res) => {
+router.post('/auth/login', async (req: Request, res: Response) => {
   try {
     const {
       body: { email, password },
     } = req;
-    const identity = await userService.findByAuthentication(email, password);
+    const identity = await findByAuthentication(email, password);
     if (!identity) {
       return res
         .status(401)
@@ -46,16 +58,13 @@ router.post('/auth/login', async (req, res) => {
         .send();
     }
     const {
-      session,
       headers: { 'user-agent': agentHeader },
       connection: { remoteAddress },
     } = req;
+    const session: Session = req.session as Session;
     session.identity = identity.id;
-    session.userAgent = userService.createUserAgentDocument(
-      agentHeader,
-      remoteAddress
-    );
-    await sessionService.saveSession(session);
+    session.userAgent = createUserAgentDocument(agentHeader, remoteAddress);
+    await saveSession(session);
     return res.status(200).send();
   } catch (e) {
     // todo log error
@@ -67,7 +76,7 @@ router.post('/auth/logout', async (req, res) => {
   const { session } = req;
   if (session) {
     try {
-      await sessionService.destroySession(session);
+      await destroySession(session as Session);
     } catch (e) {
       // todo log error
     }
@@ -78,7 +87,7 @@ router.post('/auth/logout', async (req, res) => {
 router.get('/auth/check', async (req, res) => {
   const { session } = req;
   try {
-    const status = (await sessionService.isValidSession(session)) ? 204 : 401;
+    const status = (await isValidSession(session as Session)) ? 204 : 401;
     res.status(status);
   } catch (e) {
     res.status(401);
@@ -86,4 +95,4 @@ router.get('/auth/check', async (req, res) => {
   return res.send();
 });
 
-module.exports = router;
+export default router;

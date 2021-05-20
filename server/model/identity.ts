@@ -1,16 +1,26 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+import mongoose, {
+  Schema,
+  model,
+  Document,
+  ValidatorProps,
+  Types,
+} from 'mongoose';
+import validator from 'validator';
+import { User } from '../@types/user';
 
-const { Schema, model } = mongoose;
+export interface MongooseIdentity extends User, Document {
+  id: string;
+  _id: Types.ObjectId;
+}
 
 const nameValidator = {
   // allow names containing apostrophes or dashes
-  validator: (v) => /^[-'.a-zA-Z]{0,50}$/.test(v),
+  validator: (v: string) => /^[-'.a-zA-Z]{0,50}$/.test(v),
   message: () =>
     'Enter a first name containing letters, apostrophes, dashes, or periods',
 };
 
-const validateUniqueEmail = async (v) => {
+const validateUniqueEmail = async (v: string) => {
   const identity = await mongoose
     .model('Identity')
     .findOne({ email: v })
@@ -18,7 +28,7 @@ const validateUniqueEmail = async (v) => {
   return identity === null;
 };
 
-const identitySchema = Schema(
+const identitySchema = new Schema<MongooseIdentity>(
   {
     firstName: {
       type: String,
@@ -35,12 +45,13 @@ const identitySchema = Schema(
       unique: true,
       validate: [
         {
-          validator: (v) => validator.isEmail(v),
-          message: (props) => `${props.value} is not a valid email address`,
+          validator: (v: string) => validator.isEmail(v),
+          message: (props: ValidatorProps) =>
+            `${props.value} is not a valid email address`,
         },
         {
-          validator: (v) => validateUniqueEmail(v),
-          message: (props) => `${props.value} is not available`,
+          validator: (v: string) => validateUniqueEmail(v),
+          message: (props: ValidatorProps) => `${props.value} is not available`,
         },
       ],
     },
@@ -64,7 +75,7 @@ const identitySchema = Schema(
   }
 );
 
-function transformToObject(doc) {
+function transformToObject(doc: MongooseIdentity) {
   return {
     firstName: doc.firstName,
     lastName: doc.lastName,
@@ -73,4 +84,4 @@ function transformToObject(doc) {
 }
 identitySchema.set('toObject', { transform: transformToObject });
 
-module.exports = mongoose.models.Identity || model('Identity', identitySchema);
+export default model('Identity', identitySchema);
