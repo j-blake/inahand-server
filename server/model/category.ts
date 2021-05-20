@@ -1,11 +1,5 @@
 import { ObjectId } from 'bson';
-import {
-  Schema,
-  model,
-  Document,
-  PreMiddlewareFunction,
-  CallbackError,
-} from 'mongoose';
+import { Schema, model, Document, PreMiddlewareFunction } from 'mongoose';
 import { Category } from '../@types/category';
 
 export interface MongooseCategory extends Category, Document {
@@ -36,10 +30,10 @@ const categorySchema = new Schema<MongooseCategory>(
 
 const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRremove(
   this: MongooseCategory,
-  next: (err?: CallbackError) => void
+  next
 ): Promise<void> {
-  const Category = model('Category');
-  const categories: MongooseCategory[] = await Category.find({
+  const Category = model<MongooseCategory>('Category');
+  const categories = await Category.find({
     parent: this.id,
   }).exec();
   categories.forEach((category) => {
