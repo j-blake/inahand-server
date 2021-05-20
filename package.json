@@ -25,7 +25,6 @@
   "scripts": {
     "start": "node dist/server.js",
     "build": "rm -rf ./dist && tsc",
-    "postinstall": "yarn run build",
     "start:dev": "nodemon --watch server --ext js,ts --exec ts-node ./server.ts",
     "lint": "eslint ./server ./test ./server.ts --ext .js,.ts",
     "test": "mocha"
