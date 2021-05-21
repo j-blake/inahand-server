@@ -1,11 +1,12 @@
-const express = require('express');
-const categoryService = require('../service/category');
+import express from 'express';
+import { Request } from '../@types/request';
+import categoryService from '../service/category';
 
 const router = express.Router();
 
 router.get('/categories', async (req, res) => {
   try {
-    const { identity } = req;
+    const { identity } = req as Request;
     const profile = identity.profiles[0];
     const jsonCategories = await categoryService.findAll(profile);
     return res.status(200).json({ categories: jsonCategories });
@@ -15,7 +16,7 @@ router.get('/categories', async (req, res) => {
 });
 
 router.post('/category', async (req, res) => {
-  const profile = req.identity.profiles[0];
+  const profile = (req as Request).identity.profiles[0];
   try {
     const category = await categoryService.create(profile, req.body);
     return res.status(201).json({ category: category.toObject() });
