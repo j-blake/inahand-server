@@ -1,6 +1,6 @@
 import express from 'express';
 import { Request } from '../@types/request';
-import categoryService from '../service/category';
+import * as categoryService from '../service/category';
 
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.post('/category', async (req, res) => {
 
 router.delete('/category/:id', async (req, res) => {
   try {
-    const category = await categoryService.delete(req.params.id);
+    const category = await categoryService.deleteCategory(req.params.id);
     if (category === null) {
       return res.status(404).send();
     }
