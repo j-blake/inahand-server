@@ -1,7 +1,7 @@
-const { assert } = require('chai');
-const sinon = require('sinon');
-const mongoose = require('mongoose');
-const connectMongoose = require('../server/mongoose').default;
+import { assert } from 'chai';
+import sinon, { SinonStub } from 'sinon';
+import mongoose from 'mongoose';
+import connectMongoose from '../server/mongoose';
 
 suite('mongoose', function mongooseSuite() {
   setup(function setup() {
@@ -10,18 +10,19 @@ suite('mongoose', function mongooseSuite() {
     sinon.stub(console, 'error');
   });
   teardown(function teardown() {
-    mongoose.connect.restore();
-    process.exit.restore();
-    console.error.restore();
+    (mongoose.connect as SinonStub).restore();
+    ((process.exit as unknown) as SinonStub).restore();
+    // eslint-disable-next-line no-console
+    (console.error as SinonStub).restore();
   });
   test('mongoose connects to MongoDB', async function connectionSuccess() {
-    mongoose.connect.resolves(true);
+    (mongoose.connect as SinonStub).resolves(true);
     const connection = await connectMongoose();
     assert.instanceOf(connection, mongoose.Connection);
   });
   test('application exits on mongoose connection failure', async function connectionFailure() {
-    mongoose.connect.throws();
+    (mongoose.connect as SinonStub).throws();
     await connectMongoose();
-    assert(process.exit.called);
+    assert(((process.exit as unknown) as SinonStub).called);
   });
 });
