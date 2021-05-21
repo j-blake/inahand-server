@@ -6,7 +6,9 @@ import authMiddleware from '../middleware/authentication';
 const filterRoutesInDirectory = (dir: string) =>
   fs
     .readdirSync(dir)
-    .filter((file) => path.extname(file) === '.js' && !file.startsWith('index'))
+    .filter((file) => {
+      return /js|ts/.test(path.extname(file)) && !file.startsWith('index');
+    })
     .map((file) => {
       const router = require(path.join(dir, path.basename(file, '.js')));
       if (router.default) {

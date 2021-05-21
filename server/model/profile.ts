@@ -2,6 +2,7 @@ import { Schema, model, Types, Document } from 'mongoose';
 import { Profile } from '../@types/profile';
 
 export interface MongooseProfile extends Profile, Document {
+  id: string;
   _id: Types.ObjectId;
 }
 

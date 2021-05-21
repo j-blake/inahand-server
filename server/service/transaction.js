@@ -47,9 +47,10 @@ class TransactionService {
         payeeAccount = transaction.payeeAccount,
       } = req.body;
       transaction.description = description || transaction.description;
-      transaction.transactionDate = transactionDate instanceof Date
-        ? transactionDate
-        : transaction.transactionDate;
+      transaction.transactionDate =
+        transactionDate instanceof Date
+          ? transactionDate
+          : transaction.transactionDate;
       transaction.payerAccount = payerAccount || transaction.payerAccount;
       transaction.payeeAccount = payeeAccount || transaction.payeeAccount;
       await transaction.save();
