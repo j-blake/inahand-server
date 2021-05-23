@@ -151,12 +151,12 @@ suite('auth router', function authRouterSuite() {
   });
 
   test('should return 204 with a valid session', function validSession(done) {
-    stub(sessionService, 'isValidSession').resolves(userMock);
+    stub(sessionService, 'isValidSession').resolves(true);
     agent.get('/api/auth/check').expect(204, done);
   });
 
   test('should return 401 with a missing session', function noValidSession(done) {
-    stub(sessionService, 'isValidSession').resolves(undefined);
+    stub(sessionService, 'isValidSession').resolves(false);
     agent.get('/api/auth/check').expect(401, done);
   });
 

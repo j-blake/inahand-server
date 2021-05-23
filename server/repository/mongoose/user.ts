@@ -13,6 +13,16 @@ export const createUser = async (
   return identityDoc.toObject();
 };
 
+export const findById = async (id: string): Promise<User | null> => {
+  const identity = await Identity.findById(id).exec();
+  return identity?.toObject() ?? null;
+};
+
+export const findByEmail = async (email: string): Promise<User | null> => {
+  const identity = await Identity.findOne({ email }).exec();
+  return identity?.toObject() ?? null;
+};
+
 // todo test if/when user routes are created
 export const update = async (user: PublicUser): Promise<User | null> => {
   const { firstName, lastName, email } = user;

@@ -1,14 +1,13 @@
 import useragent from 'useragent';
 
 import * as passwordService from './password';
-import Identity from '../model/identity';
 import { getUserRepo } from '../repository';
 import { User } from '../@types/user';
 import { UserAgent } from '../@types/userAgent';
 
-export const findById = async (id: string): Promise<User> => {
-  const identity = await Identity.findById(id).exec();
-  return identity?.toObject() as User;
+export const findById = async (id: string): Promise<User | null> => {
+  const repo = getUserRepo();
+  return repo.findById(id);
 };
 
 export const createUser = async (
@@ -32,7 +31,8 @@ export const findByAuthentication = async (
   password: User['passwordHash']
 ): Promise<User | null> => {
   try {
-    const identity = await Identity.findOne({ email }).exec();
+    const repo = getUserRepo();
+    const identity = await repo.findByEmail(email);
     if (!identity) {
       return null;
     }
@@ -46,7 +46,7 @@ export const findByAuthentication = async (
     }
     return identity;
   } catch (e) {
-    // todo log exception
+    // todo [IN-5] log exception
     return null;
   }
 };
