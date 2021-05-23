@@ -27,8 +27,8 @@ suite('auth router', function authRouterSuite() {
     email,
     isActive: true,
     profiles: [],
-    dateCreated: new Date(),
-    dateUpdated: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   const userAgentMock: UserAgent = {

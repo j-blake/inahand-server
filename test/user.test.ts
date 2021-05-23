@@ -1,9 +1,11 @@
 import { assert } from 'chai';
 import sinon, { SinonStub } from 'sinon';
 import mongoose from 'mongoose';
+import * as repo from '../server/repository/mongoose/user';
 import * as userService from '../server/service/user';
 import * as passwordService from '../server/service/password';
 import { MongooseIdentity } from '../server/model/identity';
+import profile from '../server/model/profile';
 
 suite('user service', function userSuite() {
   let mock: MongooseIdentity;
@@ -14,7 +16,6 @@ suite('user service', function userSuite() {
     mock.email = 'yark@tarp.com';
     mock.firstName = name;
     mock.passwordHash = 'hashpass';
-    mongoose.Model.prototype.save = sinon.stub().resolves();
     mongoose.Query.prototype.exec = sinon.stub().resolves();
   });
 
@@ -23,24 +24,33 @@ suite('user service', function userSuite() {
   });
 
   test('should return object on successful user creation', async function createUser() {
-    const first = 'lark';
-    const last = 'tarpleton';
+    const firstName = 'lark';
+    const lastName = 'tarpleton';
     const email = 'l@a.com';
-    const hash = 'hashting';
-    const identity = await userService.createUser(first, last, email, hash);
+    const hash = 'hashthing';
+    sinon.stub(repo, 'createUser').resolves({
+      id: '123',
+      firstName,
+      lastName,
+      email,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isActive: true,
+      passwordHash: hash,
+      profiles: [new profile()],
+    });
+    const identity = await userService.createUser(
+      firstName,
+      lastName,
+      email,
+      hash
+    );
     assert.isObject(identity);
-    assert.equal(first, identity?.firstName);
-    assert.equal(last, identity?.lastName);
-    assert.equal(hash, identity?.passwordHash);
+    assert.equal(firstName, identity?.firstName);
+    assert.equal(lastName, identity?.lastName);
     assert.equal(1, identity?.profiles.length);
     assert.isObject(identity?.profiles[0]);
     assert.isEmpty(identity?.profiles[0].accounts);
-  });
-
-  test('should return null on unsuccessful user creation', async function unsuccessfulCreateUser() {
-    mongoose.Model.prototype.save = sinon.stub().throws();
-    const identity = await userService.createUser('f', 'l', 'e', 'h');
-    assert.isNull(identity);
   });
 
   test('should return null if no identity with submitted email address exists', async function emailAddressNotExist() {
