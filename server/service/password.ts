@@ -4,7 +4,7 @@ import PasswordError from '../error/password';
 export const createPasswordHash = async (
   plaintextPassword: string
 ): Promise<string> => {
-  if (!/^[\w!@#$%^&*()-+=]{20,40}$/.test(plaintextPassword)) {
+  if (!/^[\w!@#$%^&*()-+=]{10,40}$/.test(plaintextPassword)) {
     throw new PasswordError(
       'passwords must be 20 to 40 alphanumeric and !@#$%&*()_-+= characters'
     );
