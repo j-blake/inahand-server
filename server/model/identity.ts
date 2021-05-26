@@ -1,6 +1,12 @@
-import mongoose, { Schema, model, Document, ValidatorProps } from 'mongoose';
+import mongoose, {
+  Schema,
+  model,
+  Document,
+  ValidatorProps,
+  SchemaDefinition,
+  DocumentDefinition,
+} from 'mongoose';
 import validator from 'validator';
-import { PublicUser } from '../@types/publicUser';
 import { User } from '../@types/user';
 import { MongooseProfile } from './profile';
 
@@ -67,24 +73,16 @@ const identitySchema = new Schema<MongooseIdentity>(
       type: Boolean,
       default: true,
     },
-  },
+  } as SchemaDefinition<DocumentDefinition<MongooseIdentity>>,
   {
     timestamps: true,
     toObject: { transform: transformToObject },
   }
 );
 
-function transformToObject(
-  _: MongooseIdentity,
-  user: MongooseIdentity
-): PublicUser {
-  return {
-    id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    profiles: user.profiles,
-  };
+function transformToObject(_: MongooseIdentity, user: MongooseIdentity): User {
+  user.id = user._id.toString();
+  return user;
 }
 const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);
 

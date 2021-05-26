@@ -14,13 +14,26 @@ export const createUser = async (
 };
 
 export const findById = async (id: string): Promise<User | null> => {
-  const identity = await Identity.findById(id).exec();
-  return identity?.toObject() ?? null;
+  const identity = await Identity.findById(id)
+    .setOptions({ lean: true })
+    .exec();
+  if (identity === null) {
+    return null;
+  }
+  identity.id = identity?._id.toString();
+  return identity;
 };
 
-export const findByEmail = async (email: string): Promise<User | null> => {
-  const identity = await Identity.findOne({ email }).exec();
-  return identity?.toObject() ?? null;
+export const findByEmail = async (
+  emailAddress: string
+): Promise<User | null> => {
+  const identity = await Identity.findOne({ email: emailAddress })
+    .select('+passwordHash')
+    .exec();
+  if (identity === null) {
+    return null;
+  }
+  return identity.toObject();
 };
 
 // todo test if/when user routes are created

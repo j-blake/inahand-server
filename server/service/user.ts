@@ -28,7 +28,7 @@ export const createUser = async (
 
 export const findByAuthentication = async (
   email: User['email'],
-  password: User['passwordHash']
+  password: string
 ): Promise<User | null> => {
   try {
     const repo = getUserRepo();
