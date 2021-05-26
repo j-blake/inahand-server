@@ -1,5 +1,4 @@
 import { Session } from '../@types/session';
-import { User } from '../@types/user';
 import * as userService from './user';
 
 export const saveSession = (session: Session): Promise<void> => {
@@ -25,5 +24,5 @@ export const destroySession = (session: Session): Promise<void> => {
   });
 };
 
-export const isValidSession = async (session: Session): Promise<User> =>
-  userService.findById(session.identity);
+export const isValidSession = async (session: Session): Promise<boolean> =>
+  (await userService.findById(session.identity)) !== null;

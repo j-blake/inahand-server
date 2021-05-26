@@ -25,6 +25,7 @@ const categorySchema = new Schema<MongooseCategory>(
   },
   {
     timestamps: true,
+    toObject: { transform: transformToObject },
   }
 );
 
@@ -45,11 +46,10 @@ categorySchema.pre<MongooseCategory>('remove', preRemove);
 
 function transformToObject(doc: MongooseCategory) {
   return {
-    id: doc.id,
+    id: doc._id,
     name: doc.name,
     parent: doc.parent,
   };
 }
-categorySchema.set('toObject', { transform: transformToObject });
 
 export default model('Category', categorySchema);

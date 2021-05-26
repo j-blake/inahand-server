@@ -20,5 +20,5 @@ const accountSchema = new Schema<MongooseAccount>(
     timestamps: true,
   }
 );
-
+// todo [IN-4] transform to object
 export default model('Account', accountSchema);

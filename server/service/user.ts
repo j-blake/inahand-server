@@ -1,38 +1,38 @@
 import useragent from 'useragent';
 
 import * as passwordService from './password';
-import * as userFactory from '../model/factory/user';
-import Identity from '../model/identity';
+import { getUserRepo } from '../repository';
 import { User } from '../@types/user';
 import { UserAgent } from '../@types/userAgent';
 
-export const findById = async (id: string): Promise<User> => {
-  const identity = await Identity.findById(id).exec();
-  return identity;
+export const findById = async (id: string): Promise<User | null> => {
+  const repo = getUserRepo();
+  return repo.findById(id);
 };
 
 export const createUser = async (
   firstName: User['firstName'],
   lastName: User['lastName'],
   email: User['email'],
-  hash: User['passwordHash']
-): Promise<User | null> => {
-  try {
-    const identity = userFactory.createUser(firstName, lastName, email, hash);
-    await identity.save();
-    return identity;
-  } catch (e) {
-    // todo log error
-    return null;
-  }
+  passwordHash: User['passwordHash']
+): Promise<User> => {
+  const repo = getUserRepo();
+  const identity = await repo.createUser({
+    firstName,
+    lastName,
+    email,
+    passwordHash,
+  });
+  return identity;
 };
 
 export const findByAuthentication = async (
   email: User['email'],
-  password: User['passwordHash']
+  password: string
 ): Promise<User | null> => {
   try {
-    const identity = await Identity.findOne({ email }).exec();
+    const repo = getUserRepo();
+    const identity = await repo.findByEmail(email);
     if (!identity) {
       return null;
     }
@@ -46,7 +46,7 @@ export const findByAuthentication = async (
     }
     return identity;
   } catch (e) {
-    // todo log exception
+    // todo [IN-5] log exception
     return null;
   }
 };

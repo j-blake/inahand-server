@@ -1,13 +1,8 @@
-import { Profile } from './profile';
+import { PublicUser } from './publicUser';
 
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
+export interface User extends PublicUser {
   passwordHash: string;
-  profiles: Profile[];
   isActive: boolean;
-  dateCreated: Date;
-  dateUpdated: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

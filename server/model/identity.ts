@@ -3,14 +3,18 @@ import mongoose, {
   model,
   Document,
   ValidatorProps,
-  Types,
+  SchemaDefinition,
+  DocumentDefinition,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
+import { MongooseProfile } from './profile';
 
 export interface MongooseIdentity extends User, Document {
   id: string;
-  _id: Types.ObjectId;
+  profiles: MongooseProfile[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const nameValidator = {
@@ -69,19 +73,17 @@ const identitySchema = new Schema<MongooseIdentity>(
       type: Boolean,
       default: true,
     },
-  },
+  } as SchemaDefinition<DocumentDefinition<MongooseIdentity>>,
   {
     timestamps: true,
+    toObject: { transform: transformToObject },
   }
 );
 
-function transformToObject(doc: MongooseIdentity) {
-  return {
-    firstName: doc.firstName,
-    lastName: doc.lastName,
-    email: doc.email,
-  };
+function transformToObject(_: MongooseIdentity, user: MongooseIdentity): User {
+  user.id = user._id.toString();
+  return user;
 }
-identitySchema.set('toObject', { transform: transformToObject });
+const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);
 
-export default model('Identity', identitySchema);
+export default IdentityModel;

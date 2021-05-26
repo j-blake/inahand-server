@@ -16,6 +16,7 @@ import { Session } from '../../@types/session';
 
 const router = Router();
 
+// todo [IN-6] standardize error response
 function formatValidationErrors(e: SerializableError) {
   const errors = {} as {
     [path: string]: string;
@@ -59,7 +60,7 @@ router.post('/auth/login', async (req: Request, res: Response) => {
     }
     const {
       headers: { 'user-agent': agentHeader },
-      connection: { remoteAddress },
+      socket: { remoteAddress },
     } = req;
     const session: Session = req.session as Session;
     session.identity = identity.id;
@@ -87,8 +88,8 @@ router.post('/auth/logout', async (req, res) => {
 router.get('/auth/check', async (req, res) => {
   const { session } = req;
   try {
-    const status = (await isValidSession(session as Session)) ? 204 : 401;
-    res.status(status);
+    const isValid = await isValidSession(session as Session);
+    res.status(isValid ? 204 : 401);
   } catch (e) {
     res.status(401);
   }

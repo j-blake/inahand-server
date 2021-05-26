@@ -13,5 +13,6 @@ declare namespace NodeJS {
     PORT: string;
     BCRYPT_SALT_ROUNDS: string;
     CONNECT_MONGO_SECRET: string;
+    BACKEND_NAME: 'mongoose';
   }
 }

@@ -1,20 +1,33 @@
-import { Schema, model, Types, Document } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
 import { Profile } from '../@types/profile';
+import { MongooseAccount } from './account';
+import { MongooseCategory } from './category';
 
 export interface MongooseProfile extends Profile, Document {
   id: string;
-  _id: Types.ObjectId;
+  accounts: MongooseAccount[];
+  categories: MongooseCategory[];
 }
 
-const profileSchema = new Schema<MongooseProfile>({
-  accounts: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Account',
-      index: true,
-      default: [],
-    },
-  ],
-});
+const profileSchema = new Schema<MongooseProfile>(
+  {
+    accounts: ['Account'],
+    categories: ['Category'],
+  },
+  {
+    toObject: { transform: transformToObject },
+  }
+);
 
-export default model('Profile', profileSchema);
+function transformToObject(
+  _: MongooseProfile,
+  profile: MongooseProfile
+): Profile {
+  return {
+    id: profile._id,
+    accounts: profile.accounts,
+    categories: profile.categories,
+  };
+}
+
+export default model<MongooseProfile>('Profile', profileSchema);
