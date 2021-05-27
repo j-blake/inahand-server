@@ -5,12 +5,19 @@ import { PublicUser } from '../../@types/publicUser';
 
 export const createUser = async (
   data: Pick<User, 'firstName' | 'lastName' | 'email' | 'passwordHash'>
-): Promise<User> => {
-  const identityDoc = await Identity.create({
+): Promise<User | null> => {
+  const profile = new Profile();
+  const identityDoc = new Identity({
     ...data,
-    profiles: [new Profile()],
+    profiles: [profile],
   });
-  return identityDoc.toObject();
+  const session = await Identity.startSession();
+  await session.withTransaction(async () => {
+    await profile.save({ session });
+    await identityDoc.save({ session });
+  });
+  session.endSession();
+  return identityDoc?.toObject() ?? null;
 };
 
 export const findById = async (id: string): Promise<User | null> => {

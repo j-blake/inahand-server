@@ -15,6 +15,7 @@ const profileSchema = new Schema<MongooseProfile>(
     categories: ['Category'],
   },
   {
+    timestamps: true,
     toObject: { transform: transformToObject },
   }
 );
@@ -24,7 +25,7 @@ function transformToObject(
   profile: MongooseProfile
 ): Profile {
   return {
-    id: profile._id,
+    id: profile._id.toString(),
     accounts: profile.accounts,
     categories: profile.categories,
   };
