@@ -22,13 +22,12 @@ export const createUser = async (
 
 export const findById = async (id: string): Promise<User | null> => {
   const identity = await Identity.findById(id)
-    .setOptions({ lean: true })
+    .populate({ path: 'profiles' })
     .exec();
   if (identity === null) {
     return null;
   }
-  identity.id = identity?._id.toString();
-  return identity;
+  return identity.toObject();
 };
 
 export const findByEmail = async (

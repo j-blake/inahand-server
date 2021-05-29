@@ -1,19 +1,26 @@
-import { Schema, model, Document } from 'mongoose';
+import {
+  Schema,
+  model,
+  Document,
+  SchemaDefinition,
+  DocumentDefinition,
+  Types,
+} from 'mongoose';
 import { Profile } from '../@types/profile';
-import { MongooseAccount } from './account';
-import { MongooseCategory } from './category';
+import { accountSchema, MongooseAccount } from './account';
+import { categorySchema, MongooseCategory } from './category';
 
 export interface MongooseProfile extends Profile, Document {
   id: string;
-  accounts: MongooseAccount[];
-  categories: MongooseCategory[];
+  accounts: Types.DocumentArray<MongooseAccount>;
+  categories: Types.DocumentArray<MongooseCategory>;
 }
 
 const profileSchema = new Schema<MongooseProfile>(
   {
-    accounts: ['Account'],
-    categories: ['Category'],
-  },
+    accounts: [accountSchema],
+    categories: [categorySchema],
+  } as SchemaDefinition<DocumentDefinition<MongooseProfile>>,
   {
     timestamps: true,
     toObject: { transform: transformToObject },

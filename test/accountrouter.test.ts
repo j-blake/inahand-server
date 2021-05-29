@@ -42,12 +42,12 @@ suite('account router', function accountRouterSuite() {
   });
 
   test('should return 200 when successfully adding a new account', function addAccount(done) {
-    (accountService.add as SinonStub).resolves();
+    (accountService.create as SinonStub).resolves();
     agent.post('/api/account').expect(201, done);
   });
 
   test('should return 400 when attempting to save new account fails', function addAccountError(done) {
-    (accountService.add as SinonStub).throws();
+    (accountService.create as SinonStub).throws();
     agent.post('/api/account').expect(400, done);
   });
 });

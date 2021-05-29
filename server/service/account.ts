@@ -1,36 +1,20 @@
 import { Account } from '../@types/account';
 import { User } from '../@types/user';
-import AccountModel, { MongooseAccount } from '../model/account';
-import { MongooseIdentity } from '../model/identity';
-import { MongooseProfile } from '../model/profile';
+import { getAccountRepo } from '../repository';
 
-export const findAll = async (
-  identity: MongooseIdentity
-): Promise<Account[] | null> => {
-  try {
-    await identity
-      .populate({
-        path: 'profiles',
-        populate: { path: 'accounts' },
-      })
-      .execPopulate();
-    return identity.profiles[0].accounts;
-  } catch (err) {
-    return null;
-  }
+export const findAll = async (identity: User): Promise<Account[] | null> => {
+  const repo = getAccountRepo();
+  const accounts = await repo.findAll(identity);
+  return accounts;
 };
 
-export const add = async (
+export const create = async (
   identity: User,
-  // todo fix - needs to be strings from request
-  data: Account
+  data: { name: string; initialBalance: number }
 ): Promise<Account | null> => {
+  const repo = getAccountRepo();
   const profile = identity.profiles[0];
-  const account = new AccountModel(data);
-  account.currentBalance = account.initialBalance;
-  await account.save();
-  profile.accounts.push(account);
-  await (profile as MongooseProfile).save();
+  const account = await repo.createAccountForProfile(profile, data);
   return account;
 };
 
@@ -41,26 +25,14 @@ export const findAccount = async (
 ): Promise<Account | undefined> => {
   const profile = identity.profiles[0];
   const { accounts } = profile;
-  const account = accounts.find(
-    (account) => (account as MongooseAccount).id === id
-  );
+  const account = accounts.find((account) => account.id === id);
   return account;
 };
 
-export const updateOne = async (
+export const update = async (
   account: Account,
-  // todo fix - needs to be strings from request
-  data: Account
-): Promise<Account> => {
-  const { name, currentBalance, isActive } = data;
-  if (name) {
-    account.name = name;
-  }
-  if (!Number.isNaN(Number.parseFloat(currentBalance.toString()))) {
-    account.currentBalance = Number.parseFloat(currentBalance.toString());
-  }
-  account.isActive = ((isActive as unknown) as string) === 'true';
-  // todo create repo layer
-  await (account as MongooseAccount).save();
-  return account;
+  data: Partial<{ name: string; currentBalance: number; isActive: boolean }>
+): Promise<Account | null> => {
+  const repo = getAccountRepo();
+  return repo.updateAccount(account, data);
 };

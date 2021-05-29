@@ -1,34 +1,48 @@
 import chai, { assert } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import mongoose from 'mongoose';
 import { Account } from '../server/@types/account';
 import { Category } from '../server/@types/category';
 import sinon from 'sinon';
 import * as accountService from '../server/service/account';
-import { MongooseIdentity } from '../server/model/identity';
-import { MongooseProfile } from '../server/model/profile';
-import AccountModel from '../server/model/account';
+import * as accountRepo from '../server/repository/mongoose/account';
+import { User } from '../server/@types/user';
+import { Profile } from '../server/@types/profile';
 
 chai.use(chaiAsPromised);
 
 suite('account service', function accountServiceSuite() {
-  let identity: MongooseIdentity;
-  let profile: MongooseProfile;
+  let profile: Profile;
+  let identity: User;
+  let account: Account;
 
   setup(function setup() {
-    const profileModel = mongoose.model('Profile');
-    const identityModel = mongoose.model('Identity');
-    profile = new profileModel({
+    profile = {
+      id: 'profileId',
       accounts: [] as Account[],
       categories: [] as Category[],
-    }) as MongooseProfile;
-    identity = new identityModel({
+    };
+    identity = {
+      id: 'userId',
       firstName: 'John',
       lastName: 'Smith',
       email: 'a@a.com',
       passwordHash: 'asdf',
       profiles: [profile],
-    }) as MongooseIdentity;
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    account = {
+      id: 'accountId',
+      name: 'old name',
+      initialBalance: 100,
+      currentBalance: 50,
+      isActive: true,
+      currency: 'USD',
+      dateCreated: new Date(),
+      dateUpdated: new Date(),
+    };
   });
 
   teardown(function teardown() {
@@ -36,54 +50,44 @@ suite('account service', function accountServiceSuite() {
   });
 
   test('should return document on successful account creation', async function addAccountSuccess() {
-    mongoose.Model.prototype.save = sinon.stub().resolves();
-    const account = await accountService.add(identity, {
-      name: 'Bank of Mongo',
-      currentBalance: 50,
-      dateCreated: new Date(),
-      dateUpdated: new Date(),
-      initialBalance: 100,
-      isActive: true,
+    const name = 'Bank of Mongo';
+    const initialBalance = 100;
+    sinon.stub(accountRepo, 'createAccountForProfile').resolves({
+      ...account,
+      name,
+      initialBalance,
+      currentBalance: initialBalance,
     });
-    assert.isObject(account);
-    assert.equal(profile.accounts[0].name, account?.name);
+    const accountDoc = await accountService.create(identity, {
+      name,
+      initialBalance,
+    });
+    assert.isObject(accountDoc);
   });
 
   test('should throw if saving account fails', async function addAccountFailure() {
-    mongoose.Model.prototype.save = sinon.stub().throws();
-    assert.isRejected(accountService.add(identity, {} as Account));
+    sinon.stub(accountRepo, 'createAccountForProfile').throws();
+    assert.isRejected(accountService.create(identity, {} as Account));
   });
 
   test('should update account record', async function udpateAccount() {
-    const account = new AccountModel({
-      name: 'old name',
-      initialBalance: 100,
-      currentBalance: 50,
-      isActive: true,
-    });
     const name = 'new name';
     const isActive = false;
     const currentBalance = 50.95;
-    const initialBalance = 1000000;
-    mongoose.Model.prototype.save = sinon.stub().resolves(
-      new AccountModel({
-        name,
-        initialBalance: 100,
-        isActive,
-        currentBalance,
-      })
-    );
-    const updatedAccount = await accountService.updateOne(account, {
+    sinon.stub(accountRepo, 'updateAccount').resolves({
+      ...account,
       name,
       isActive,
       currentBalance,
-      initialBalance,
-      dateCreated: new Date(),
-      dateUpdated: new Date(),
     });
-    assert.equal(updatedAccount.name, 'new name');
-    assert.equal(updatedAccount.currentBalance, 50.95);
-    assert.equal(updatedAccount.isActive, false);
-    assert.equal(updatedAccount.initialBalance, 100);
+    const updatedAccount = await accountService.update(account, {
+      name,
+      isActive,
+      currentBalance,
+    });
+    assert.equal(updatedAccount?.name, 'new name');
+    assert.equal(updatedAccount?.currentBalance, 50.95);
+    assert.equal(updatedAccount?.isActive, false);
+    assert.equal(updatedAccount?.initialBalance, 100);
   });
 });
