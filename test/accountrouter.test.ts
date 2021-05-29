@@ -1,8 +1,6 @@
-/* eslint-disable no-underscore-dangle */
 import sinon, { SinonStub } from 'sinon';
 import request from 'supertest';
 import { Request } from '../server/@types/request';
-import Identity from '../server/model/identity';
 import accountRouter from '../server/routes/account';
 import * as accountService from '../server/service/account';
 import app from './mockApp';
@@ -12,7 +10,17 @@ const agent = request.agent(app);
 suite('account router', function accountRouterSuite() {
   suiteSetup(function suiteSetup() {
     app.use((req, _, next) => {
-      (req as Request).identity = new Identity();
+      (req as Request).identity = {
+        id: '123',
+        firstName: 'lark',
+        lastName: 'tarpleton',
+        email: 'l@a.com',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        isActive: true,
+        passwordHash: 'hashthing',
+        profiles: [],
+      };
       next();
     });
     app.use('/api', accountRouter);
