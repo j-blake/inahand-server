@@ -5,6 +5,6 @@ export interface Account {
   initialBalance: number;
   currency: string;
   isActive: boolean;
-  dateCreated: Date;
-  dateUpdated: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -40,8 +40,8 @@ suite('account service', function accountServiceSuite() {
       currentBalance: 50,
       isActive: true,
       currency: 'USD',
-      dateCreated: new Date(),
-      dateUpdated: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
   });
 

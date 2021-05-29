@@ -35,8 +35,8 @@ function transformToObject(
     currentBalance: account.currentBalance,
     currency: account.currency,
     isActive: account.isActive,
-    dateCreated: account.dateCreated,
-    dateUpdated: account.dateUpdated,
+    createdAt: account.createdAt,
+    updatedAt: account.updatedAt,
   };
 }
 // todo [IN-4] transform to object
