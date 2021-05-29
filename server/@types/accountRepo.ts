@@ -11,8 +11,8 @@ export interface AccountRepository {
       initialBalance: number;
     }
   ) => Promise<Account>;
-  updateAccount: (
+  updateAccountForProfile: (
     account: Account,
-    data: Partial<{ name: string; currentBalance: number; isActive: boolean }>
+    profile: Profile
   ) => Promise<Account | null>;
 }

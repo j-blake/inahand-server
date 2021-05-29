@@ -74,13 +74,13 @@ suite('account service', function accountServiceSuite() {
     const name = 'new name';
     const isActive = false;
     const currentBalance = 50.95;
-    sinon.stub(accountRepo, 'updateAccount').resolves({
+    sinon.stub(accountRepo, 'updateAccountForProfile').resolves({
       ...account,
       name,
       isActive,
       currentBalance,
     });
-    const updatedAccount = await accountService.update(account, {
+    const updatedAccount = await accountService.update(identity, account, {
       name,
       isActive,
       currentBalance,

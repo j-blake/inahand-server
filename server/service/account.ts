@@ -18,7 +18,6 @@ export const create = async (
   return account;
 };
 
-// todo fix or remove
 export const findAccount = async (
   identity: User,
   id: string
@@ -30,9 +29,15 @@ export const findAccount = async (
 };
 
 export const update = async (
+  identity: User,
   account: Account,
   data: Partial<{ name: string; currentBalance: number; isActive: boolean }>
 ): Promise<Account | null> => {
+  const profile = identity.profiles[0];
+  const { name, currentBalance, isActive } = data;
+  account.name = name ?? account.name;
+  account.currentBalance = currentBalance ?? account.currentBalance;
+  account.isActive = isActive !== undefined ? isActive : account.isActive;
   const repo = getAccountRepo();
-  return repo.updateAccount(account, data);
+  return repo.updateAccountForProfile(account, profile);
 };

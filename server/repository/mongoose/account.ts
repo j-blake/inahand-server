@@ -29,21 +29,16 @@ export const createAccountForProfile = async (
   return account.toObject();
 };
 
-export const updateAccount = async (
+export const updateAccountForProfile = async (
   account: Account,
-  data: Partial<{ name: string; currentBalance: number; isActive: boolean }>
+  profile: Profile
 ): Promise<Account | null> => {
-  const profile = await MongooseProfile.findOne({ 'accounts._id': account.id });
-  const accountDocument = profile?.accounts.id(account.id);
-  if (!accountDocument) {
+  const profileDocument = await MongooseProfile.findById(profile.id);
+  const accountDocument = profileDocument?.accounts.id(account.id);
+  if (!(accountDocument && profileDocument)) {
     return null;
   }
-  const { name, currentBalance, isActive } = data;
-  accountDocument.name = name ?? accountDocument.name;
-  accountDocument.currentBalance =
-    currentBalance ?? accountDocument.currentBalance;
-  accountDocument.isActive =
-    isActive !== undefined ? isActive : accountDocument.isActive;
-  await profile?.save();
+  accountDocument.set({ ...account });
+  await profileDocument.save();
   return accountDocument.toObject();
 };
