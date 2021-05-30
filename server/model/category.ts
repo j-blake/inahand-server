@@ -6,7 +6,7 @@ export interface MongooseCategory extends Category, Document {
   _id: ObjectId;
 }
 
-const categorySchema = new Schema<MongooseCategory>(
+export const categorySchema = new Schema<MongooseCategory>(
   {
     name: {
       type: String,

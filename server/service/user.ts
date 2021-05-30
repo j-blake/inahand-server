@@ -4,6 +4,8 @@ import * as passwordService from './password';
 import { getUserRepo } from '../repository';
 import { User } from '../@types/user';
 import { UserAgent } from '../@types/userAgent';
+import { pick } from 'lodash';
+import { PublicUser } from '../@types/publicUser';
 
 export const findById = async (id: string): Promise<User | null> => {
   const repo = getUserRepo();
@@ -15,7 +17,7 @@ export const createUser = async (
   lastName: User['lastName'],
   email: User['email'],
   passwordHash: User['passwordHash']
-): Promise<User> => {
+): Promise<PublicUser> => {
   const repo = getUserRepo();
   const identity = await repo.createUser({
     firstName,
@@ -23,7 +25,13 @@ export const createUser = async (
     email,
     passwordHash,
   });
-  return identity;
+  return pick(identity, [
+    'id',
+    'firstName',
+    'lastName',
+    'email',
+    'profiles',
+  ]) as PublicUser;
 };
 
 export const findByAuthentication = async (
