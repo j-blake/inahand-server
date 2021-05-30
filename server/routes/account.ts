@@ -1,8 +1,8 @@
-import express from 'express';
+import { Router } from 'express';
 import { Request as IdentityRequest } from '../@types/request';
 import * as service from '../service/account';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/accounts', async (req, res) => {
   try {

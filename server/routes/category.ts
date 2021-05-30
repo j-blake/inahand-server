@@ -1,8 +1,8 @@
-import express from 'express';
+import { Router } from 'express';
 import { Request } from '../@types/request';
 import * as categoryService from '../service/category';
 
-const router = express.Router();
+const router = Router();
 
 router.get('/categories', async (req, res) => {
   try {
