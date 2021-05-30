@@ -1,8 +1,16 @@
 import { ObjectId } from 'bson';
-import { Schema, model, Document, PreMiddlewareFunction } from 'mongoose';
+import {
+  Schema,
+  model,
+  Types,
+  PreMiddlewareFunction,
+  SchemaDefinition,
+  DocumentDefinition,
+} from 'mongoose';
 import { Category } from '../@types/category';
 
-export interface MongooseCategory extends Category, Document {
+export interface MongooseCategory extends Category, Types.EmbeddedDocument {
+  id: string;
   _id: ObjectId;
 }
 
@@ -12,17 +20,13 @@ export const categorySchema = new Schema<MongooseCategory>(
       type: String,
       required: true,
     },
-    profile: {
-      type: Schema.Types.ObjectId,
-      ref: 'Profile',
-    },
-    parent: {
+    parentCategory: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
       sparse: true,
     },
     isActive: { type: Boolean, default: true },
-  },
+  } as SchemaDefinition<DocumentDefinition<MongooseCategory>>,
   {
     timestamps: true,
     toObject: { transform: transformToObject },
@@ -34,9 +38,7 @@ const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRre
   next
 ): Promise<void> {
   const Category = model<MongooseCategory>('Category');
-  const categories = await Category.find({
-    parent: this.id,
-  }).exec();
+  const categories = await Category.find({ parentCategory: this._id }).exec();
   categories.forEach((category) => {
     category.remove();
   });
