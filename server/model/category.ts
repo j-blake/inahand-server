@@ -1,4 +1,3 @@
-import { ObjectId } from 'bson';
 import {
   Schema,
   model,
@@ -8,10 +7,17 @@ import {
   DocumentDefinition,
 } from 'mongoose';
 import { Category } from '../@types/category';
+import { MongooseProfile } from './profile';
 
-export interface MongooseCategory extends Category, Types.EmbeddedDocument {
+export interface MongooseCategory extends Types.EmbeddedDocument {
   id: string;
-  _id: ObjectId;
+  _id: Types.ObjectId;
+  name: string;
+  parentCategory: Types.ObjectId | string | null;
+  createdBy: Types.ObjectId | string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const categorySchema = new Schema<MongooseCategory>(
@@ -25,6 +31,11 @@ export const categorySchema = new Schema<MongooseCategory>(
       ref: 'Category',
       sparse: true,
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'Identity',
+      sparse: true,
+    },
     isActive: { type: Boolean, default: true },
   } as SchemaDefinition<DocumentDefinition<MongooseCategory>>,
   {
@@ -33,12 +44,15 @@ export const categorySchema = new Schema<MongooseCategory>(
   }
 );
 
-const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRremove(
+const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRemove(
   this: MongooseCategory,
   next
 ): Promise<void> {
-  const Category = model<MongooseCategory>('Category');
-  const categories = await Category.find({ parentCategory: this._id }).exec();
+  const profile = (this.parent() as unknown) as MongooseProfile;
+  const id = this._id;
+  const categories = profile.categories.filter(
+    (category) => category.parentCategory?.toString() === id.toString()
+  );
   categories.forEach((category) => {
     category.remove();
   });
@@ -46,12 +60,16 @@ const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRre
 };
 categorySchema.pre<MongooseCategory>('remove', preRemove);
 
-function transformToObject(doc: MongooseCategory) {
+function transformToObject(doc: MongooseCategory): Category {
   return {
-    id: doc._id,
+    id: doc._id.toString(),
     name: doc.name,
-    parent: doc.parent,
+    parentCategory: doc.parentCategory?.toString() ?? null,
+    createdBy: doc.createdBy.toString(),
+    isActive: doc.isActive,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
   };
 }
 
-export default model('Category', categorySchema);
+export default model<MongooseCategory>('Category', categorySchema);

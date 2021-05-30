@@ -1,10 +1,9 @@
-import { ObjectId } from 'bson';
-
 export interface Category {
   id: string;
   name: string;
-  parentCategory: Category | ObjectId | null;
+  parentCategory: string | null;
+  createdBy: string;
   isActive: boolean;
-  dateCreated: Date;
-  dateUpdated: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

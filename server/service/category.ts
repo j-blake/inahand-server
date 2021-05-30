@@ -1,28 +1,34 @@
 import { Category } from '../@types/category';
 import { Profile } from '../@types/profile';
-import CategoryModel, { MongooseCategory } from '../model/category';
+import { User } from '../@types/user';
+import { getCategoryRepo } from '../repository';
 
-export const findAll = async (profile: Profile): Promise<Category[]> => {
-  const categories = await CategoryModel.find({ profile });
-  return (categories as MongooseCategory[]).map((category) =>
-    category.toObject()
-  );
+export const findAll = async (
+  profile: Profile,
+  user: User
+): Promise<Category[]> => {
+  const repo = getCategoryRepo();
+  const categories = await repo.findByProfileForUser(profile, user);
+  return categories;
 };
 
 export const create = async (
   profile: Profile,
-  data: Category
-): Promise<MongooseCategory> => {
-  const category = new CategoryModel({ ...data, profile: profile.id });
-  await category.save();
+  data: Partial<Category>
+): Promise<Category> => {
+  const repo = getCategoryRepo();
+  const category = await repo.createCategoryForProfile(profile, data);
   return category;
 };
 
-export const deleteCategory = async (id: string): Promise<Category | null> => {
-  const category = await CategoryModel.findById(id).exec();
+export const deleteCategory = async (
+  profile: Profile,
+  id: string
+): Promise<Category | null> => {
+  const repo = getCategoryRepo();
+  const category = await repo.removeCategoryForProfile(profile, id);
   if (category === null) {
     return null;
   }
-  await category.remove();
   return category;
 };
