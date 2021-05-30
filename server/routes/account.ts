@@ -39,7 +39,7 @@ router.patch('/account/:id', async (req, res) => {
     if (updatedAccount === null) {
       throw new Error('Unable to update account');
     }
-    return res.status(200).json({ updatedAccount });
+    return res.status(200).json({ account: updatedAccount });
   } catch (err) {
     const { message } = err;
     return res.status(400).json({ message });
