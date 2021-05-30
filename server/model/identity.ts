@@ -10,9 +10,14 @@ import validator from 'validator';
 import { User } from '../@types/user';
 import { MongooseProfile } from './profile';
 
-export interface MongooseIdentity extends User, Document {
+export interface MongooseIdentity extends Document {
   id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  passwordHash: string;
   profiles: MongooseProfile[];
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -80,9 +85,18 @@ const identitySchema = new Schema<MongooseIdentity>(
   }
 );
 
-function transformToObject(_: MongooseIdentity, user: MongooseIdentity): User {
-  user.id = user._id.toString();
-  return user;
+function transformToObject(doc: MongooseIdentity, user: User): User {
+  return {
+    id: doc._id.toString(),
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    profiles: user.profiles,
+    isActive: user.isActive,
+    passwordHash: user.passwordHash,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
 }
 const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);
 

@@ -1,7 +1,6 @@
 import {
   Schema,
   model,
-  Document,
   SchemaDefinition,
   DocumentDefinition,
   Types,
@@ -10,8 +9,8 @@ import { Profile } from '../@types/profile';
 import { accountSchema, MongooseAccount } from './account';
 import { categorySchema, MongooseCategory } from './category';
 
-export interface MongooseProfile extends Profile, Document {
-  id: string;
+export interface MongooseProfile {
+  _id: Types.ObjectId;
   accounts: Types.DocumentArray<MongooseAccount>;
   categories: Types.DocumentArray<MongooseCategory>;
 }
@@ -27,14 +26,11 @@ const profileSchema = new Schema<MongooseProfile>(
   }
 );
 
-function transformToObject(
-  _: MongooseProfile,
-  profile: MongooseProfile
-): Profile {
+function transformToObject(doc: MongooseProfile): Profile {
   return {
-    id: profile._id.toString(),
-    accounts: profile.accounts,
-    categories: profile.categories,
+    id: doc._id.toString(),
+    accounts: doc.accounts.toObject(),
+    categories: doc.categories.toObject(),
   };
 }
 
