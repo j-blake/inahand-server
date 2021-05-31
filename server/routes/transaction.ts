@@ -1,7 +1,7 @@
-const express = require('express');
+import { Router } from 'express';
+import transactionService from '../service/transaction';
 
-const router = express.Router();
-const transactionService = require('../service/transaction');
+const router = Router();
 
 router.get('/transactions', (req, res) => transactionService.findAll(req, res));
 
