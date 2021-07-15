@@ -32,16 +32,16 @@ export default class TransactionService {
   //     const {
   //       description = transaction.description,
   //       transactionDate = transaction.transactionDate,
-  //       payerAccount = transaction.payerAccount,
-  //       payeeAccount = transaction.payeeAccount,
+  //       payingAccount = transaction.payingAccount,
+  //       receivingAccount = transaction.receivingAccount,
   //     } = req.body;
   //     transaction.description = description || transaction.description;
   //     transaction.transactionDate =
   //       transactionDate instanceof Date
   //         ? transactionDate
   //         : transaction.transactionDate;
-  //     transaction.payerAccount = payerAccount || transaction.payerAccount;
-  //     transaction.payeeAccount = payeeAccount || transaction.payeeAccount;
+  //     transaction.payingAccount = payingAccount || transaction.payingAccount;
+  //     transaction.receivingAccount = receivingAccount || transaction.receivingAccount;
   //     await transaction.save();
   //     return res.status(200).json({ transaction });
   //   } catch (err) {

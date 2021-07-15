@@ -20,9 +20,8 @@ interface MongooseTransaction {
   transactionType: 'debit' | 'credit';
   description: string;
   transactionDate: Date;
-  details: TransactionDetail[];
-  payerAccount: Types.ObjectId;
-  payeeAccount: Types.ObjectId;
+  payingAccount: Types.ObjectId;
+  receivingAccount: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }

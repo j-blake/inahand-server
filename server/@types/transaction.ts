@@ -6,8 +6,8 @@ export interface Transaction {
   description: string;
   transactionDate: Date;
   details?: { category: string; amount: number }[];
-  payerAccount: string;
-  payeeAccount: string;
+  payingAccount: string;
+  receivingAccount: string;
   createdAt: Date;
   updatedAt: Date;
 }

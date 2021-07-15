@@ -6,7 +6,7 @@ export const findByAccount = async (
   accountId: string
 ): Promise<Transaction[]> => {
   const transactionDocuments = await TransactionModel.find({
-    payerAccount: accountId,
+    payingAccount: accountId,
   }).exec();
   return transactionDocuments.map(
     (transaction) => (transaction.toObject() as unknown) as Transaction

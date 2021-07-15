@@ -6,6 +6,6 @@ export type EditableTransactionFields = Pick<
   | 'amount'
   | 'transactionDate'
   | 'transactionType'
-  | 'payerAccount'
+  | 'payingAccount'
 > &
-  Partial<Pick<Transaction, 'currency' | 'details' | 'payeeAccount'>>;
+  Partial<Pick<Transaction, 'currency' | 'details' | 'receivingAccount'>>;
