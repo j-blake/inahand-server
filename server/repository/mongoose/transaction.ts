@@ -1,6 +1,7 @@
 import { Transaction } from '../../@types/transaction';
 import { EditableTransactionFields } from '../../@types/EditableTransactionFields';
 import TransactionModel from '../../model/transaction';
+import { Profile } from '../../@types/profile';
 
 export const findByAccount = async (
   accountId: string
@@ -11,6 +12,20 @@ export const findByAccount = async (
   return transactionDocuments.map(
     (transaction) => (transaction.toObject() as unknown) as Transaction
   );
+};
+
+export const findOneByProfile = async (
+  id: string,
+  profile: Profile
+): Promise<Transaction | null> => {
+  const transaction = await TransactionModel.findOne({
+    _id: id,
+    payingAccount: { $in: profile.accounts.map((account) => account.id) },
+  }).exec();
+  if (!transaction) {
+    return null;
+  }
+  return (transaction.toObject() as unknown) as Transaction;
 };
 
 export const create = async (
