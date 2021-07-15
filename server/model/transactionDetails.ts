@@ -1,25 +1,52 @@
-import { Schema, model, Types } from 'mongoose';
+import {
+  Schema,
+  model,
+  Types,
+  SchemaDefinition,
+  DocumentDefinition,
+} from 'mongoose';
+import { MongooseCategory } from './category';
 
-export interface TransactionDetail extends Types.EmbeddedDocument {
+export interface TransactionDetail {
+  id: string;
   amount: number;
-  category: Types.ObjectId;
+  category: string;
 }
 
-export const transactionDetailSchema = new Schema<TransactionDetail>({
-  amount: {
-    type: Schema.Types.Number,
-    validate: [
-      (v: number) => v >= 0,
-      'The amount {VALUE} is less than the minimum value of 0.00',
-    ],
-  },
-  category: {
-    type: Schema.Types.ObjectId,
-    ref: 'Category',
-  },
-});
+export interface MongooseTransactionDetail extends Types.EmbeddedDocument {
+  id: string;
+  amount: number;
+  category: MongooseCategory;
+}
 
-export default model<TransactionDetail>(
+export const transactionDetailSchema = new Schema<MongooseTransactionDetail>(
+  {
+    amount: {
+      type: Schema.Types.Number,
+      validate: [
+        (v: number) => v >= 0,
+        'The amount {VALUE} is less than the minimum value of 0.00',
+      ],
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+    },
+  } as SchemaDefinition<DocumentDefinition<MongooseTransactionDetail>>,
+  {
+    timestamps: true,
+    toObject: { transform: transformToObject },
+  }
+);
+
+function transformToObject(doc: MongooseTransactionDetail) {
+  return {
+    amount: doc.amount,
+    category: doc.category,
+  };
+}
+
+export default model<MongooseTransactionDetail>(
   'TransactionDetail',
   transactionDetailSchema
 );
