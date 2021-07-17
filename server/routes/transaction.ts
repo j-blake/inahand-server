@@ -1,20 +1,45 @@
 import { Router } from 'express';
-import transactionService from '../service/transaction';
+import {
+  findAccountTransactionByProfile,
+  findTransactionByProfile,
+  createTransaction,
+} from '../service/transaction';
+import { Request } from '../@types/request';
 
 const router = Router();
 
-router.get('/transactions', async (_, res) => {
-  const transactions = await transactionService.findAll();
-  res.status(200).json({ transactions });
+router.get('/transactions/:accountId', async (req, res) => {
+  const { identity } = req as Request;
+  const profile = identity.profiles[0];
+  try {
+    const transactions = await findAccountTransactionByProfile(
+      profile,
+      req.params.accountId
+    );
+    res.status(200).json({ transactions });
+  } catch (e) {
+    res.status(400).json(e.toString());
+  }
 });
 
-// router.get('/transaction/:id', (req, res) =>
-//   transactionService.findOne(req, res)
-// );
+router.get('/transaction/:transactionId', async (req, res) => {
+  const { identity } = req as Request;
+  const profile = identity.profiles[0];
+  try {
+    const transaction = await findTransactionByProfile(
+      req.params.transactionId,
+      profile
+    );
+    res.status(200).json({ transaction });
+  } catch (e) {
+    res.status(400).json(e.toString());
+  }
+});
 
 router.post('/transaction', async (req, res) => {
+  const { body, identity } = req as Request;
   try {
-    const transaction = await transactionService.add(req.body);
+    const transaction = await createTransaction(body, identity.profiles[0]);
     return res.status(201).json({ transaction });
   } catch (err) {
     const { message } = err;
