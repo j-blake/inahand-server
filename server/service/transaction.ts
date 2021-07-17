@@ -9,7 +9,7 @@ import {
   convertToMajorUnits,
 } from '../util/currency';
 
-export const findAccountTransactionByProfile = async (
+export const findAccountTransactionsByProfile = async (
   profile: Profile,
   accountId: string
 ): Promise<Transaction[]> => {

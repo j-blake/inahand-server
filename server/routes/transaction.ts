@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  findAccountTransactionByProfile,
+  findAccountTransactionsByProfile,
   findTransactionByProfile,
   createTransaction,
 } from '../service/transaction';
@@ -12,7 +12,7 @@ router.get('/transactions/:accountId', async (req, res) => {
   const { identity } = req as Request;
   const profile = identity.profiles[0];
   try {
-    const transactions = await findAccountTransactionByProfile(
+    const transactions = await findAccountTransactionsByProfile(
       profile,
       req.params.accountId
     );
