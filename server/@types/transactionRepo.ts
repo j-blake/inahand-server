@@ -10,7 +10,7 @@ export interface TransactionRepository {
   ) => Promise<Transaction | null>;
   create: (data: EditableTransactionFields) => Promise<Transaction>;
   update: (
-    transaction: Transaction,
+    transactionId: string,
     data: EditableTransactionFields
   ) => Promise<Transaction>;
   deleteTransaction: (transactionId: string) => Promise<Transaction>;

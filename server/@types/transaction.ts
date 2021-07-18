@@ -7,7 +7,7 @@ export interface Transaction {
   transactionDate: Date;
   details?: { category: string; amount: number }[];
   payingAccount: string;
-  receivingAccount: string;
+  receivingAccount?: string;
   createdAt: Date;
   updatedAt: Date;
 }

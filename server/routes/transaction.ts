@@ -3,6 +3,8 @@ import {
   findAccountTransactionsByProfile,
   findTransactionByProfile,
   createTransaction,
+  updateTransaction,
+  deleteTransaction,
 } from '../service/transaction';
 import { Request } from '../@types/request';
 
@@ -47,12 +49,31 @@ router.post('/transaction', async (req, res) => {
   }
 });
 
-// router.patch('/transaction/:id', (req, res) =>
-//   transactionService.updateOne(req, res)
-// );
+router.patch('/transaction/:id', async (req, res) => {
+  const { body, identity } = req as Request;
+  try {
+    const transaction = await updateTransaction(
+      req.params.id,
+      body,
+      identity.profiles[0]
+    );
+    return res.status(200).json({ transaction });
+  } catch (err) {
+    const { message } = err;
+    return res.status(400).json({ message });
+  }
+});
 
-// router.delete('/transaction/:id', (req, res) =>
-//   transactionService.deleteOne(req, res)
-// );
+router.delete('/transaction/:id', async (req, res) => {
+  try {
+    const { identity } = req as Request;
+    const profile = identity.profiles[0];
+    const transaction = await deleteTransaction(req.params.id, profile);
+    return res.status(204).json({ transaction });
+  } catch (err) {
+    const { message } = err;
+    return res.status(400).json({ message });
+  }
+});
 
 export default router;

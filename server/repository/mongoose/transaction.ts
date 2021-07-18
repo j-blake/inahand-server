@@ -1,7 +1,9 @@
 import { Transaction } from '../../@types/transaction';
 import { EditableTransactionFields } from '../../@types/EditableTransactionFields';
 import TransactionModel from '../../model/transaction';
+import TransactionDetailsModel from '../../model/transactionDetails';
 import { Profile } from '../../@types/profile';
+import { ObjectId } from 'mongodb';
 
 export const findByAccount = async (
   accountId: string
@@ -35,17 +37,51 @@ export const create = async (
   return (transaction.toObject() as unknown) as Transaction;
 };
 
-export const update = (
-  transaction: Transaction,
+export const update = async (
+  transactionId: string,
   data: EditableTransactionFields
-): Promise<Transaction> => {
-  return Promise.resolve(Object.assign({}, transaction, data) as Transaction);
+): Promise<Transaction | null> => {
+  const {
+    description,
+    amount,
+    transactionDate,
+    transactionType,
+    currency,
+    details,
+    payingAccount,
+    receivingAccount,
+  } = data;
+  const document = await TransactionModel.findById(transactionId);
+  if (document === null) {
+    return null;
+  }
+  document.description = description;
+  document.amount = amount;
+  document.transactionDate = transactionDate;
+  document.transactionType = transactionType;
+  document.currency = currency || 'USD';
+  document.payingAccount = new ObjectId(payingAccount);
+  if (receivingAccount) {
+    document.receivingAccount = new ObjectId(receivingAccount);
+  }
+  const detailsDocuments = details?.map(
+    (detail) => new TransactionDetailsModel(detail)
+  );
+  document.details = detailsDocuments;
+  await document.save();
+  return (document.toObject() as unknown) as Transaction;
 };
 
-export const deleteTransaction = (
+export const deleteTransaction = async (
   transactionId: string
-): Promise<Transaction> => {
-  return Promise.resolve({ id: transactionId } as Transaction);
+): Promise<Transaction | null> => {
+  const transaction = await TransactionModel.findByIdAndDelete(
+    transactionId
+  ).exec();
+  if (transaction === null) {
+    return null;
+  }
+  return (transaction.toObject() as unknown) as Transaction;
 };
 
 /**
