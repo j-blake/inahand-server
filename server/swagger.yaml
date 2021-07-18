@@ -476,10 +476,10 @@ components:
               category:
                 type: string
                 example: 5c2ad36a9edd9fe599a71e00
-        payerAccount:
+        payingAccount:
           type: string
           example: 5c2ad36a9edd9fe599a71e00
-        payeeAccount:
+        receivingAccount:
           type: string
           example: 5c2ad36a9edd9fe599a71e00
         createdAt:
