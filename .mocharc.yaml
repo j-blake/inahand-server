@@ -2,7 +2,7 @@ ui: tdd
 extension:
   - js
   - ts
-watch: true
+watch: false
 watch-files:
   - 'server/**/*.js'
   - 'test/**/*.js'
