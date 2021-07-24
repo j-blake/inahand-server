@@ -1,4 +1,4 @@
-import sinon, { SinonStub } from 'sinon';
+import sinon, { SinonStubbedInstance } from 'sinon';
 import request from 'supertest';
 import { Request } from '../server/@types/request';
 import accountRouter from '../server/routes/account';
@@ -8,6 +8,7 @@ import app from './mockApp';
 const agent = request.agent(app);
 
 suite('account router', function accountRouterSuite() {
+  let accountServiceMock: SinonStubbedInstance<typeof accountService>;
   suiteSetup(function suiteSetup() {
     app.use((req, _, next) => {
       (req as Request).identity = {
@@ -27,7 +28,7 @@ suite('account router', function accountRouterSuite() {
   });
 
   setup(function setup() {
-    sinon.stub(accountService);
+    accountServiceMock = sinon.stub(accountService);
   });
 
   teardown(function tearDown() {
@@ -40,22 +41,22 @@ suite('account router', function accountRouterSuite() {
   });
 
   test('should return 200 on request for all accounts belonging to a user', function allAccounts(done) {
-    (accountService.findAll as SinonStub).resolves([]);
+    accountServiceMock.findAll.resolves([]);
     agent.get('/api/accounts').expect(200, done);
   });
 
   test('should return 404 if identity object is misshaped in request for all accounts', function allAccountsError(done) {
-    (accountService.findAll as SinonStub).throws();
+    accountServiceMock.findAll.throws();
     agent.get('/api/accounts').expect(404, done);
   });
 
   test('should return 200 when successfully adding a new account', function addAccount(done) {
-    (accountService.create as SinonStub).resolves();
+    accountServiceMock.create.resolves();
     agent.post('/api/account').expect(201, done);
   });
 
   test('should return 400 when attempting to save new account fails', function addAccountError(done) {
-    (accountService.create as SinonStub).throws();
+    accountServiceMock.create.throws();
     agent.post('/api/account').expect(400, done);
   });
 });
