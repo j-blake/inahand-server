@@ -64,4 +64,24 @@ suite('currency util', function () {
     const amount = convertToMajorUnits(3249365, isoCurrency);
     assert.equal(amount, 3249.365);
   });
+
+  test('should not convert number if minor units are invalid', function () {
+    const isoCurrency: IsoCurrency = {
+      CtryNm: 'JORDAN',
+      CcyNm: 'Jordanian Dinar',
+      Ccy: 'JOD',
+      CcyNbr: '400',
+    };
+    const majorUnit1 = convertToMajorUnits(123, isoCurrency);
+    assert.equal(majorUnit1, 123);
+
+    const minorUnit1 = convertToMinorUnits(123, isoCurrency);
+    assert.equal(123, minorUnit1);
+
+    const majorUnit2 = convertToMajorUnits(123, null);
+    assert.equal(majorUnit2, 123);
+
+    const minorUnit2 = convertToMinorUnits(123, null);
+    assert.equal(123, minorUnit2);
+  });
 });

@@ -13,6 +13,8 @@ export interface MongooseProfile {
   _id: Types.ObjectId;
   accounts: Types.DocumentArray<MongooseAccount>;
   categories: Types.DocumentArray<MongooseCategory>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const profileSchema = new Schema<MongooseProfile>(
@@ -31,6 +33,8 @@ function transformToObject(doc: MongooseProfile): Profile {
     id: doc._id.toString(),
     accounts: doc.accounts.toObject(),
     categories: doc.categories.toObject(),
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
   };
 }
 
