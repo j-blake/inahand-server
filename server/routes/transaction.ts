@@ -20,7 +20,7 @@ router.get('/transactions/:accountId', async (req, res) => {
     );
     res.status(200).json({ transactions });
   } catch (e) {
-    res.status(400).json(e.toString());
+    res.status(400).json((e as Error).toString());
   }
 });
 
@@ -34,7 +34,7 @@ router.get('/transaction/:transactionId', async (req, res) => {
     );
     res.status(200).json({ transaction });
   } catch (e) {
-    res.status(400).json(e.toString());
+    res.status(400).json((e as Error).toString());
   }
 });
 
