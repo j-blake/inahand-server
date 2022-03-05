@@ -3,8 +3,6 @@ import path from 'path';
 import morgan from 'morgan';
 import cors from 'cors';
 import helmet from 'helmet';
-import YAML from 'yamljs';
-import swaggerUI from 'swagger-ui-express';
 import connectMongoose from './mongoose';
 import sessionMiddleware from './middleware/session';
 import routes from './routes';
@@ -27,9 +25,6 @@ const setupApp = async () => {
   );
   app.use(helmet());
   app.use(sessionMiddleware(await connectMongoose()));
-
-  const swaggerDocument = YAML.load('server/swagger.yaml');
-  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
   app.use(morgan('dev'));
 
