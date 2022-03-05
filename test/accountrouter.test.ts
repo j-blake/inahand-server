@@ -1,5 +1,6 @@
 import sinon, { SinonStubbedInstance } from 'sinon';
 import request from 'supertest';
+import { Account } from '../server/@types/account';
 import { Request } from '../server/@types/request';
 import accountRouter from '../server/routes/account';
 import * as accountService from '../server/service/account';
@@ -58,5 +59,23 @@ suite('account router', function accountRouterSuite() {
   test('should return 400 when attempting to save new account fails', function addAccountError(done) {
     accountServiceMock.create.throws();
     agent.post('/api/account').expect(400, done);
+  });
+
+  test('should return 200 when updating an account', function updatedAccountSucceeds(done) {
+    accountServiceMock.findAccount.resolves({} as Account);
+    accountServiceMock.update.resolves();
+    agent.patch('/api/account/123').expect(200, done);
+  });
+
+  test('should return 404 when attempting to update an account that cannot be fetched', function updatedAccountSucceeds(done) {
+    accountServiceMock.findAccount.resolves(null);
+    accountServiceMock.update.resolves();
+    agent.patch('/api/account/123').expect(404, done);
+  });
+
+  test('should return 400 when there is a problem updating the account', function updatedAccountSucceeds(done) {
+    accountServiceMock.findAccount.resolves({} as Account);
+    accountServiceMock.update.throws();
+    agent.patch('/api/account/123').expect(400, done);
   });
 });

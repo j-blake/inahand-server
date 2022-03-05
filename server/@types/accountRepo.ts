@@ -4,6 +4,7 @@ import { Profile } from './profile';
 
 export interface AccountRepository {
   findAll: (user: User) => Promise<Account[] | null>;
+  findOne: (id: string, user: User) => Promise<Account | null>;
   createAccountForProfile: (
     profile: Profile,
     data: {

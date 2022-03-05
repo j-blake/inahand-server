@@ -1,12 +1,11 @@
 import { Router } from 'express';
-import { Request as IdentityRequest } from '../@types/request';
 import * as service from '../service/account';
 
 const router = Router();
 
 router.get('/accounts', async (req, res) => {
   try {
-    const { identity } = req as IdentityRequest;
+    const { identity } = req;
     const accounts = await service.findAll(identity);
     return res.status(200).json({ accounts });
   } catch (err) {
@@ -19,18 +18,18 @@ router.post('/account', async (req, res) => {
     const {
       identity,
       body: { data },
-    } = req as IdentityRequest;
+    } = req;
     const account = await service.create(identity, data);
     return res.status(201).json({ account });
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });
 
 router.patch('/account/:id', async (req, res) => {
   try {
-    const { identity } = req as IdentityRequest;
+    const { identity } = req;
     const account = await service.findAccount(identity, req.params.id);
     if (!account) {
       return res.status(404).send();
@@ -41,7 +40,7 @@ router.patch('/account/:id', async (req, res) => {
     }
     return res.status(200).json({ account: updatedAccount });
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });

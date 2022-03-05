@@ -25,7 +25,7 @@ export const findAccount = async (
   const profile = identity.profiles[0];
   const { accounts } = profile;
   const account = accounts.find((account) => account.id === id);
-  return account;
+  return Promise.resolve(account);
 };
 
 export const update = async (
@@ -37,7 +37,7 @@ export const update = async (
   const { name, currentBalance, isActive } = data;
   account.name = name ?? account.name;
   account.currentBalance = currentBalance ?? account.currentBalance;
-  account.isActive = isActive !== undefined ? isActive : account.isActive;
+  account.isActive = isActive ?? account.isActive;
   const repo = getAccountRepo();
   return repo.updateAccountForProfile(account, profile);
 };
