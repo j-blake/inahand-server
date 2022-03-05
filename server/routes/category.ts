@@ -24,7 +24,7 @@ router.post('/category', async (req, res) => {
     const category = await categoryService.create(profile, data);
     return res.status(201).json({ category });
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });
@@ -42,7 +42,7 @@ router.delete('/category/:id', async (req, res) => {
     }
     return res.status(204).send();
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });
