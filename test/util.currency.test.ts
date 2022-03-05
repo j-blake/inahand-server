@@ -78,10 +78,10 @@ suite('currency util', function () {
     const minorUnit1 = convertToMinorUnits(123, isoCurrency);
     assert.equal(123, minorUnit1);
 
-    const majorUnit2 = convertToMajorUnits(123, null);
+    const majorUnit2 = convertToMajorUnits(123, {} as IsoCurrency);
     assert.equal(majorUnit2, 123);
 
-    const minorUnit2 = convertToMinorUnits(123, null);
+    const minorUnit2 = convertToMinorUnits(123, {} as IsoCurrency);
     assert.equal(123, minorUnit2);
   });
 });
