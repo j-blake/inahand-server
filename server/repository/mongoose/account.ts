@@ -14,6 +14,18 @@ export const findAll = (user: User): Promise<Account[] | null> => {
   });
 };
 
+export const findOne = (id: string, user: User): Promise<Account | null> => {
+  return new Promise((resolve, reject) => {
+    try {
+      return resolve(
+        user.profiles[0].accounts.find((a) => a.id === id) ?? null
+      );
+    } catch (err) {
+      return reject();
+    }
+  });
+};
+
 export const createAccountForProfile = async (
   profile: Profile,
   data: {

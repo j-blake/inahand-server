@@ -1,6 +1,6 @@
 import { NextFunction, Response } from 'express';
 import { Request } from '../@types/request';
-import { Session } from '../@types/session';
+import { User } from '../@types/user';
 import { findById } from '../service/user';
 
 function handleUnauthorizedResponse(res: Response) {
@@ -18,11 +18,11 @@ export default async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const session: Session = req.session as Session;
+  const session = req.session;
   if (!session) {
     return handleUnauthorizedResponse(res);
   }
-  let identity = null;
+  let identity: User | null = null;
   try {
     identity = await findById(session.identity);
   } catch (e) {

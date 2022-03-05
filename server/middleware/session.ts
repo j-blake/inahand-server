@@ -8,7 +8,7 @@ function initializeSessionMiddleware(
 ): e.RequestHandler {
   return session({
     name: process.env.COOKIE_NAME,
-    secret: process.env.CONNECT_MONGO_SECRET || '',
+    secret: process.env.CONNECT_MONGO_SECRET,
     store: MongoStore.create({ client: mongooseConnection.getClient() }),
     resave: true,
     rolling: true,

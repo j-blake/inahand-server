@@ -20,6 +20,8 @@ suite('account service', function accountServiceSuite() {
       id: 'profileId',
       accounts: [] as Account[],
       categories: [] as Category[],
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
     identity = {
       id: 'userId',
@@ -47,6 +49,22 @@ suite('account service', function accountServiceSuite() {
 
   teardown(function teardown() {
     sinon.restore();
+  });
+
+  test('should return array of documents', async function findAllAccounts() {
+    sinon.stub(accountRepo, 'findAll').resolves([account]);
+    const accounts = await accountService.findAll(identity);
+    assert.deepEqual(accounts, [account]);
+  });
+
+  test('should find account', async function findOneAccount() {
+    profile.accounts.push(account);
+    sinon.stub(accountRepo, 'findOne').resolves(account);
+    const fetchedAccount = await accountService.findAccount(
+      identity,
+      account.id
+    );
+    assert.equal(fetchedAccount, account);
   });
 
   test('should return document on successful account creation', async function addAccountSuccess() {
@@ -89,5 +107,15 @@ suite('account service', function accountServiceSuite() {
     assert.equal(updatedAccount?.currentBalance, 50.95);
     assert.equal(updatedAccount?.isActive, false);
     assert.equal(updatedAccount?.initialBalance, 100);
+  });
+
+  test('should keep existing account data when updating with empty changes', async function udpateAccount() {
+    const { name, currentBalance, isActive, initialBalance } = account;
+    sinon.stub(accountRepo, 'updateAccountForProfile').resolves(account);
+    const updatedAccount = await accountService.update(identity, account, {});
+    assert.equal(updatedAccount?.name, name);
+    assert.equal(updatedAccount?.currentBalance, currentBalance);
+    assert.equal(updatedAccount?.isActive, isActive);
+    assert.equal(updatedAccount?.initialBalance, initialBalance);
   });
 });
