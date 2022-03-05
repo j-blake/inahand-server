@@ -44,7 +44,7 @@ router.post('/transaction', async (req, res) => {
     const transaction = await createTransaction(body, identity.profiles[0]);
     return res.status(201).json({ transaction });
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });
@@ -59,7 +59,7 @@ router.patch('/transaction/:id', async (req, res) => {
     );
     return res.status(200).json({ transaction });
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });
@@ -71,7 +71,7 @@ router.delete('/transaction/:id', async (req, res) => {
     const transaction = await deleteTransaction(req.params.id, profile);
     return res.status(204).json({ transaction });
   } catch (err) {
-    const { message } = err;
+    const { message } = err as Error;
     return res.status(400).json({ message });
   }
 });

@@ -39,7 +39,9 @@ router.post('/auth/create', async (req, res) => {
     const user = await createUser(firstName, lastName, email, hash);
     return res.status(201).json({ user });
   } catch (e) {
-    return res.status(400).json({ errors: formatValidationErrors(e) });
+    return res
+      .status(400)
+      .json({ errors: formatValidationErrors(e as SerializableError) });
   }
 });
 
