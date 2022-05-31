@@ -68,7 +68,7 @@ suite('account router', function accountRouterSuite() {
   });
 
   test('should return 404 when attempting to update an account that cannot be fetched', function updatedAccountSucceeds(done) {
-    accountServiceMock.findAccount.resolves(null);
+    accountServiceMock.findAccount.resolves(undefined);
     accountServiceMock.update.resolves();
     agent.patch('/api/account/123').expect(404, done);
   });

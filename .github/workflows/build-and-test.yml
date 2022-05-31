@@ -21,17 +21,20 @@ jobs:
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: borales/actions-yarn@v2.3.0
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
         with:
-          cmd: install # will run `yarn install` command
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: build # will run `yarn build` command
-      - uses: borales/actions-yarn@v2.3.0
-        with:
-          cmd: test # will run `yarn test` command
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn
+      - run: yarn run build
+      - run: yarn run test

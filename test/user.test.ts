@@ -22,6 +22,8 @@ suite('user service', function userSuite() {
           id: '123',
           categories: [],
           accounts: [],
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
     };
