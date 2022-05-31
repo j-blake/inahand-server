@@ -10,7 +10,7 @@ import { accountSchema, MongooseAccount } from './account';
 import { categorySchema, MongooseCategory } from './category';
 
 export interface MongooseProfile {
-  _id: Types.ObjectId;
+  _id: Schema.Types.ObjectId;
   accounts: Types.DocumentArray<MongooseAccount>;
   categories: Types.DocumentArray<MongooseCategory>;
   createdAt: Date;

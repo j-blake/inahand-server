@@ -5,18 +5,17 @@ import mongoose, {
   ValidatorProps,
   SchemaDefinition,
   DocumentDefinition,
+  Types,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
-import { MongooseProfile } from './profile';
 
-export interface MongooseIdentity extends Document {
-  id: string;
+export interface MongooseIdentity {
   firstName: string;
   lastName: string;
   email: string;
   passwordHash: string;
-  profiles: MongooseProfile[];
+  profiles: Types.ObjectId[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -85,9 +84,12 @@ const identitySchema = new Schema<MongooseIdentity>(
   }
 );
 
-function transformToObject(doc: MongooseIdentity, user: User): User {
+function transformToObject(
+  doc: Document<MongooseIdentity, never, User>,
+  user: User
+): User {
   return {
-    id: doc._id.toString(),
+    id: doc._id?.toString() ?? '',
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,

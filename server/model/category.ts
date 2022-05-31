@@ -9,9 +9,8 @@ import {
 import { Category } from '../@types/category';
 import { MongooseProfile } from './profile';
 
-export interface MongooseCategory extends Types.EmbeddedDocument {
+export interface MongooseCategory extends Types.Subdocument {
   id: string;
-  _id: Types.ObjectId;
   name: string;
   parentCategory: Types.ObjectId | string | null;
   createdBy: Types.ObjectId | string;
@@ -44,20 +43,18 @@ export const categorySchema = new Schema<MongooseCategory>(
   }
 );
 
-const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRemove(
-  this: MongooseCategory,
-  next
-): Promise<void> {
-  const profile = (this.parent() as unknown) as MongooseProfile;
-  const id = this._id;
-  const categories = profile.categories.filter(
-    (category) => category.parentCategory?.toString() === id.toString()
-  );
-  categories.forEach((category) => {
-    category.remove();
-  });
-  return next();
-};
+const preRemove: PreMiddlewareFunction<MongooseCategory> =
+  async function preRemove(this: MongooseCategory, next): Promise<void> {
+    const profile = this.parent() as unknown as MongooseProfile;
+    const id = this._id;
+    const categories = profile.categories.filter(
+      (category) => category.parentCategory?.toString() === id.toString()
+    );
+    categories.forEach((category) => {
+      category.remove();
+    });
+    return next();
+  };
 categorySchema.pre<MongooseCategory>('remove', preRemove);
 
 function transformToObject(doc: MongooseCategory): Category {

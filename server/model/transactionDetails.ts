@@ -13,7 +13,7 @@ export interface TransactionDetail {
   category: string;
 }
 
-export interface MongooseTransactionDetail extends Types.EmbeddedDocument {
+export interface MongooseTransactionDetail extends Types.Subdocument {
   id: string;
   amount: number;
   category: MongooseCategory;

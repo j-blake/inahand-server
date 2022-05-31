@@ -1,7 +1,6 @@
 import {
   Schema,
   model,
-  Types,
   SchemaDefinition,
   DocumentDefinition,
   Document,
@@ -14,7 +13,6 @@ import {
 } from './transactionDetails';
 
 export interface MongooseTransaction extends Document {
-  _id: Types.ObjectId;
   id: string;
   amount: number;
   currency: string;
@@ -22,8 +20,8 @@ export interface MongooseTransaction extends Document {
   description: string;
   transactionDate: Date;
   details?: MongooseTransactionDetail[];
-  payingAccount: Types.ObjectId;
-  receivingAccount: Types.ObjectId;
+  payingAccount: Schema.Types.ObjectId;
+  receivingAccount: Schema.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -111,7 +109,7 @@ function transformToObject(doc: MongooseTransaction): Transaction {
     currency: doc.currency,
     description: doc.description,
     details: doc.details?.map(
-      (detail) => (detail.toObject() as unknown) as TransactionDetail
+      (detail) => detail.toObject() as unknown as TransactionDetail
     ),
     receivingAccount: doc.receivingAccount?.toString(),
     payingAccount: doc.payingAccount?.toString(),

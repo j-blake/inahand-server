@@ -3,7 +3,7 @@ import { EditableTransactionFields } from '../../@types/EditableTransactionField
 import TransactionModel from '../../model/transaction';
 import TransactionDetailsModel from '../../model/transactionDetails';
 import { Profile } from '../../@types/profile';
-import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 
 export const findByAccount = async (
   accountId: string
@@ -12,7 +12,7 @@ export const findByAccount = async (
     payingAccount: accountId,
   }).exec();
   return transactionDocuments.map(
-    (transaction) => (transaction.toObject() as unknown) as Transaction
+    (transaction) => transaction.toObject() as unknown as Transaction
   );
 };
 
@@ -27,14 +27,14 @@ export const findOneByProfile = async (
   if (!transaction) {
     return null;
   }
-  return (transaction.toObject() as unknown) as Transaction;
+  return transaction.toObject() as unknown as Transaction;
 };
 
 export const create = async (
   data: EditableTransactionFields
 ): Promise<Transaction> => {
   const transaction = await TransactionModel.create(data);
-  return (transaction.toObject() as unknown) as Transaction;
+  return transaction.toObject() as unknown as Transaction;
 };
 
 export const update = async (
@@ -60,16 +60,18 @@ export const update = async (
   document.transactionDate = transactionDate;
   document.transactionType = transactionType;
   document.currency = currency || 'USD';
-  document.payingAccount = new ObjectId(payingAccount);
+  document.payingAccount = new mongoose.Schema.Types.ObjectId(payingAccount);
   if (receivingAccount) {
-    document.receivingAccount = new ObjectId(receivingAccount);
+    document.receivingAccount = new mongoose.Schema.Types.ObjectId(
+      receivingAccount
+    );
   }
   const detailsDocuments = details?.map(
     (detail) => new TransactionDetailsModel(detail)
   );
   document.details = detailsDocuments;
   await document.save();
-  return (document.toObject() as unknown) as Transaction;
+  return document.toObject() as unknown as Transaction;
 };
 
 export const deleteTransaction = async (
@@ -81,7 +83,7 @@ export const deleteTransaction = async (
   if (transaction === null) {
     return null;
   }
-  return (transaction.toObject() as unknown) as Transaction;
+  return transaction.toObject() as unknown as Transaction;
 };
 
 /**

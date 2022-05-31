@@ -1,10 +1,8 @@
-import { ObjectId } from 'bson';
 import { Schema, model, Types } from 'mongoose';
 import { Account } from '../@types/account';
 
-export interface MongooseAccount extends Account, Types.EmbeddedDocument {
+export interface MongooseAccount extends Account, Types.Subdocument {
   id: string;
-  _id: ObjectId;
 }
 
 export const accountSchema = new Schema<MongooseAccount>(
