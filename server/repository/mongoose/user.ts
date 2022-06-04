@@ -17,7 +17,7 @@ export const createUser = async (
     await identityDoc.save({ session });
   });
   session.endSession();
-  return ((identityDoc?.toObject() as unknown) as User) ?? null;
+  return identityDoc?.toObject<User>() ?? null;
 };
 
 export const findById = async (id: string): Promise<User | null> => {
@@ -27,7 +27,7 @@ export const findById = async (id: string): Promise<User | null> => {
   if (identity === null) {
     return null;
   }
-  return (identity.toObject() as unknown) as User;
+  return identity?.toObject<User>();
 };
 
 export const findByEmail = async (
@@ -39,7 +39,7 @@ export const findByEmail = async (
   if (identity === null) {
     return null;
   }
-  return (identity.toObject() as unknown) as User;
+  return identity?.toObject<User>();
 };
 
 // todo test if/when user routes are created
@@ -53,5 +53,5 @@ export const update = async (user: PublicUser): Promise<User | null> => {
   if (identity === null) {
     throw new Error(`Unable to update identity document: ${user.id}`);
   }
-  return (identity as unknown) as User;
+  return identity?.toObject<User>();
 };

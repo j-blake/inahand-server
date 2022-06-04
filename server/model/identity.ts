@@ -6,6 +6,7 @@ import mongoose, {
   SchemaDefinition,
   DocumentDefinition,
   Types,
+  ObjectId,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
@@ -85,19 +86,19 @@ const identitySchema = new Schema<MongooseIdentity>(
 );
 
 function transformToObject(
-  doc: Document<MongooseIdentity, never, User>,
-  user: User
+  doc: Document<ObjectId, never, User>,
+  ret: User
 ): User {
   return {
     id: doc._id?.toString() ?? '',
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    profiles: user.profiles,
-    isActive: user.isActive,
-    passwordHash: user.passwordHash,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
+    firstName: ret.firstName,
+    lastName: ret.lastName,
+    email: ret.email,
+    profiles: ret.profiles,
+    isActive: ret.isActive,
+    passwordHash: ret.passwordHash,
+    createdAt: ret.createdAt,
+    updatedAt: ret.updatedAt,
   };
 }
 const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);
