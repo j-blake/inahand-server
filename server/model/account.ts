@@ -1,9 +1,7 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model, Types, HydratedDocument } from 'mongoose';
 import { Account } from '../@types/account';
 
-export interface MongooseAccount extends Account, Types.Subdocument {
-  id: string;
-}
+type MongooseAccount = Account & Types.Subdocument;
 
 export const accountSchema = new Schema<MongooseAccount>(
   {
@@ -23,8 +21,7 @@ export const accountSchema = new Schema<MongooseAccount>(
 );
 
 function transformToObject(
-  _: MongooseAccount,
-  account: MongooseAccount
+  account: HydratedDocument<MongooseAccount>
 ): Account {
   return {
     id: account._id.toString(),
@@ -37,5 +34,5 @@ function transformToObject(
     updatedAt: account.updatedAt,
   };
 }
-// todo [IN-4] transform to object
+
 export default model<MongooseAccount>('Account', accountSchema);
