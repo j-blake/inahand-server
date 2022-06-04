@@ -76,7 +76,7 @@ const identitySchema = new Schema<User>(
 
 function transformToObject(doc: HydratedDocument<User>): User {
   return {
-    id: doc._id?.toString() ?? '',
+    id: doc._id.toString(),
     firstName: doc.firstName,
     lastName: doc.lastName,
     email: doc.email,
