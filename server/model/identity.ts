@@ -5,22 +5,9 @@ import mongoose, {
   ValidatorProps,
   SchemaDefinition,
   DocumentDefinition,
-  Types,
-  ObjectId,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
-
-export interface MongooseIdentity {
-  firstName: string;
-  lastName: string;
-  email: string;
-  passwordHash: string;
-  profiles: Types.ObjectId[];
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 const nameValidator = {
   // allow names containing apostrophes or dashes
@@ -37,14 +24,16 @@ const validateUniqueEmail = async (v: string) => {
   return identity === null;
 };
 
-const identitySchema = new Schema<MongooseIdentity>(
+const identitySchema = new Schema<User>(
   {
     firstName: {
       type: String,
+      required: true,
       validate: nameValidator,
     },
     lastName: {
       type: String,
+      required: true,
       validate: nameValidator,
     },
     email: {
@@ -78,7 +67,7 @@ const identitySchema = new Schema<MongooseIdentity>(
       type: Boolean,
       default: true,
     },
-  } as SchemaDefinition<DocumentDefinition<MongooseIdentity>>,
+  } as SchemaDefinition<DocumentDefinition<User>>,
   {
     timestamps: true,
     toObject: { transform: transformToObject },
@@ -86,11 +75,11 @@ const identitySchema = new Schema<MongooseIdentity>(
 );
 
 function transformToObject(
-  doc: Document<ObjectId, never, User>,
+  doc: Document<string, never, User>,
   ret: User
 ): User {
   return {
-    id: doc._id?.toString() ?? '',
+    id: doc._id ?? '',
     firstName: ret.firstName,
     lastName: ret.lastName,
     email: ret.email,
@@ -101,6 +90,6 @@ function transformToObject(
     updatedAt: ret.updatedAt,
   };
 }
-const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);
+const IdentityModel = model<User>('Identity', identitySchema);
 
 export default IdentityModel;
