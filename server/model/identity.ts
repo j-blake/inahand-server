@@ -1,10 +1,10 @@
 import mongoose, {
   Schema,
   model,
-  Document,
   ValidatorProps,
   SchemaDefinition,
   DocumentDefinition,
+  HydratedDocument,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
@@ -74,20 +74,17 @@ const identitySchema = new Schema<User>(
   }
 );
 
-function transformToObject(
-  doc: Document<string, never, User>,
-  ret: User
-): User {
+function transformToObject(doc: HydratedDocument<User>): User {
   return {
-    id: doc._id ?? '',
-    firstName: ret.firstName,
-    lastName: ret.lastName,
-    email: ret.email,
-    profiles: ret.profiles,
-    isActive: ret.isActive,
-    passwordHash: ret.passwordHash,
-    createdAt: ret.createdAt,
-    updatedAt: ret.updatedAt,
+    id: doc._id?.toString() ?? '',
+    firstName: doc.firstName,
+    lastName: doc.lastName,
+    email: doc.email,
+    profiles: doc.profiles,
+    isActive: doc.isActive,
+    passwordHash: doc.passwordHash,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
   };
 }
 const IdentityModel = model<User>('Identity', identitySchema);
