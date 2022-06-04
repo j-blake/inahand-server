@@ -5,7 +5,7 @@ import {
   SchemaDefinition,
   DocumentDefinition,
 } from 'mongoose';
-import { MongooseCategory } from './category';
+import { Category } from '../@types/category';
 
 export interface TransactionDetail {
   id: string;
@@ -16,7 +16,7 @@ export interface TransactionDetail {
 export interface MongooseTransactionDetail extends Types.Subdocument {
   id: string;
   amount: number;
-  category: MongooseCategory;
+  category: Category;
 }
 
 export const transactionDetailSchema = new Schema<MongooseTransactionDetail>(
