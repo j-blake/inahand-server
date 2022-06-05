@@ -1,25 +1,18 @@
 import mongoose, {
   Schema,
   model,
-  Document,
   ValidatorProps,
   SchemaDefinition,
   DocumentDefinition,
+  HydratedDocument,
+  Types,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
 import { MongooseProfile } from './profile';
 
-export interface MongooseIdentity extends Document {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  passwordHash: string;
-  profiles: MongooseProfile[];
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+export interface MongooseIdentity extends User {
+  profiles: Types.DocumentArray<MongooseProfile>;
 }
 
 const nameValidator = {
@@ -41,10 +34,12 @@ const identitySchema = new Schema<MongooseIdentity>(
   {
     firstName: {
       type: String,
+      required: true,
       validate: nameValidator,
     },
     lastName: {
       type: String,
+      required: true,
       validate: nameValidator,
     },
     email: {
@@ -85,17 +80,17 @@ const identitySchema = new Schema<MongooseIdentity>(
   }
 );
 
-function transformToObject(doc: MongooseIdentity, user: User): User {
+function transformToObject(doc: HydratedDocument<MongooseIdentity>): User {
   return {
     id: doc._id.toString(),
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    profiles: user.profiles,
-    isActive: user.isActive,
-    passwordHash: user.passwordHash,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
+    firstName: doc.firstName,
+    lastName: doc.lastName,
+    email: doc.email,
+    profiles: doc.profiles?.map((p) => p.toObject()),
+    isActive: doc.isActive,
+    passwordHash: doc.passwordHash,
+    createdAt: doc.createdAt,
+    updatedAt: doc.updatedAt,
   };
 }
 const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);

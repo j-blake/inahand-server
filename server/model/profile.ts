@@ -1,20 +1,20 @@
 import {
   Schema,
+  Types,
   model,
   SchemaDefinition,
   DocumentDefinition,
-  Types,
+  HydratedDocument,
 } from 'mongoose';
+import { Account } from '../@types/account';
+import { Category } from '../@types/category';
 import { Profile } from '../@types/profile';
-import { accountSchema, MongooseAccount } from './account';
-import { categorySchema, MongooseCategory } from './category';
+import { accountSchema } from './account';
+import { categorySchema } from './category';
 
-export interface MongooseProfile {
-  _id: Types.ObjectId;
-  accounts: Types.DocumentArray<MongooseAccount>;
-  categories: Types.DocumentArray<MongooseCategory>;
-  createdAt: Date;
-  updatedAt: Date;
+export interface MongooseProfile extends Profile {
+  accounts: Types.DocumentArray<Account>;
+  categories: Types.DocumentArray<Category>;
 }
 
 const profileSchema = new Schema<MongooseProfile>(
@@ -28,11 +28,11 @@ const profileSchema = new Schema<MongooseProfile>(
   }
 );
 
-function transformToObject(doc: MongooseProfile): Profile {
+function transformToObject(doc: HydratedDocument<MongooseProfile>): Profile {
   return {
     id: doc._id.toString(),
-    accounts: doc.accounts.toObject(),
-    categories: doc.categories.toObject(),
+    accounts: doc.accounts.map((a) => a.toObject()),
+    categories: doc.categories.map((c) => c.toObject()),
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   };

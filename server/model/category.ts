@@ -5,20 +5,12 @@ import {
   PreMiddlewareFunction,
   SchemaDefinition,
   DocumentDefinition,
+  HydratedDocument,
 } from 'mongoose';
 import { Category } from '../@types/category';
 import { MongooseProfile } from './profile';
 
-export interface MongooseCategory extends Types.EmbeddedDocument {
-  id: string;
-  _id: Types.ObjectId;
-  name: string;
-  parentCategory: Types.ObjectId | string | null;
-  createdBy: Types.ObjectId | string;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+type MongooseCategory = Category & Types.Subdocument;
 
 export const categorySchema = new Schema<MongooseCategory>(
   {
@@ -44,23 +36,21 @@ export const categorySchema = new Schema<MongooseCategory>(
   }
 );
 
-const preRemove: PreMiddlewareFunction<MongooseCategory> = async function preRemove(
-  this: MongooseCategory,
-  next
-): Promise<void> {
-  const profile = (this.parent() as unknown) as MongooseProfile;
-  const id = this._id;
-  const categories = profile.categories.filter(
-    (category) => category.parentCategory?.toString() === id.toString()
-  );
-  categories.forEach((category) => {
-    category.remove();
-  });
-  return next();
-};
+const preRemove: PreMiddlewareFunction<MongooseCategory> =
+  async function preRemove(this: MongooseCategory, next): Promise<void> {
+    const profile = this.parent() as HydratedDocument<MongooseProfile>;
+    const id = this._id;
+    const categories = profile.categories.filter(
+      (category) => category.parentCategory?.toString() === id.toString()
+    );
+    categories.forEach((category) => {
+      category.remove();
+    });
+    return next();
+  };
 categorySchema.pre<MongooseCategory>('remove', preRemove);
 
-function transformToObject(doc: MongooseCategory): Category {
+function transformToObject(doc: HydratedDocument<MongooseCategory>): Category {
   return {
     id: doc._id.toString(),
     name: doc.name,
