@@ -30,7 +30,7 @@ const profileSchema = new Schema<MongooseProfile>(
 
 function transformToObject(doc: HydratedDocument<MongooseProfile>): Profile {
   return {
-    id: doc._id?.toString() ?? '',
+    id: doc._id.toString(),
     accounts: doc.accounts.map((a) => a.toObject()),
     categories: doc.categories.map((c) => c.toObject()),
     createdAt: doc.createdAt,

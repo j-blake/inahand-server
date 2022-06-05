@@ -5,9 +5,15 @@ import mongoose, {
   SchemaDefinition,
   DocumentDefinition,
   HydratedDocument,
+  Types,
 } from 'mongoose';
 import validator from 'validator';
 import { User } from '../@types/user';
+import { MongooseProfile } from './profile';
+
+export interface MongooseIdentity extends User {
+  profiles: Types.DocumentArray<MongooseProfile>;
+}
 
 const nameValidator = {
   // allow names containing apostrophes or dashes
@@ -24,7 +30,7 @@ const validateUniqueEmail = async (v: string) => {
   return identity === null;
 };
 
-const identitySchema = new Schema<User>(
+const identitySchema = new Schema<MongooseIdentity>(
   {
     firstName: {
       type: String,
@@ -67,26 +73,26 @@ const identitySchema = new Schema<User>(
       type: Boolean,
       default: true,
     },
-  } as SchemaDefinition<DocumentDefinition<User>>,
+  } as SchemaDefinition<DocumentDefinition<MongooseIdentity>>,
   {
     timestamps: true,
     toObject: { transform: transformToObject },
   }
 );
 
-function transformToObject(doc: HydratedDocument<User>): User {
+function transformToObject(doc: HydratedDocument<MongooseIdentity>): User {
   return {
     id: doc._id.toString(),
     firstName: doc.firstName,
     lastName: doc.lastName,
     email: doc.email,
-    profiles: doc.profiles,
+    profiles: doc.profiles?.map((p) => p.toObject()),
     isActive: doc.isActive,
     passwordHash: doc.passwordHash,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   };
 }
-const IdentityModel = model<User>('Identity', identitySchema);
+const IdentityModel = model<MongooseIdentity>('Identity', identitySchema);
 
 export default IdentityModel;
